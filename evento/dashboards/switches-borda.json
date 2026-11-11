@@ -1,0 +1,245 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_ZABBIX",
+      "label": "Zabbix",
+      "description": "Datasource do Zabbix",
+      "type": "datasource",
+      "pluginId": "alexanderzobnin-zabbix-datasource",
+      "pluginName": "Zabbix"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "datasource",
+      "id": "alexanderzobnin-zabbix-datasource",
+      "name": "Zabbix",
+      "version": "4.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "marcusolsson-dynamictext-panel",
+      "name": "Business Text",
+      "version": "5.0.0"
+    }
+  ],
+  "title": "Evento — Switches de Borda",
+  "uid": "evento-switches-borda",
+  "tags": [
+    "zabbix",
+    "noc",
+    "evento"
+  ],
+  "editable": true,
+  "graphTooltip": 0,
+  "refresh": "1m",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 11,
+  "links": [
+    {
+      "type": "dashboards",
+      "tags": [
+        "evento"
+      ],
+      "asDropdown": false,
+      "includeVars": false,
+      "keepTime": false,
+      "title": "Evento",
+      "icon": "external link",
+      "targetBlank": false
+    }
+  ],
+  "description": "Frente dos switches do grupo Evento/Rede/Switches (templates oficiais Cisco IOS / Huawei VRP / Network Generic by SNMP). P = interfaces, S = sistema, F = problemas.",
+  "templating": {
+    "list": [
+      {
+        "name": "switch",
+        "label": "Switch",
+        "type": "query",
+        "datasource": {
+          "type": "alexanderzobnin-zabbix-datasource",
+          "uid": "${DS_ZABBIX}"
+        },
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1,
+        "sort": 1,
+        "regex": "",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "options": [],
+        "query": {
+          "queryType": 1,
+          "group": {
+            "filter": "/^Evento\\/Rede\\/Switches$/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "item": {
+            "filter": ""
+          },
+          "itemTag": {
+            "filter": ""
+          }
+        }
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 30,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "timeFrom": "15m",
+      "hideTimeOverride": true,
+      "targets": [
+        {
+          "refId": "P",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/^Evento\\/Rede\\/Switches$/"
+          },
+          "host": {
+            "filter": "/$switch/"
+          },
+          "item": {
+            "filter": "/^Interface .*: (Operational status|Bits received|Bits sent|Speed|Inbound packets with errors|Outbound packets with errors|Duplex status)$/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "S",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/^Evento\\/Rede\\/Switches$/"
+          },
+          "host": {
+            "filter": "/$switch/"
+          },
+          "item": {
+            "filter": "/CPU utilization|Memory utilization|Temperature|Uptime|Power supply status|Fan status/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "5",
+          "group": {
+            "filter": "/^Evento\\/Rede\\/Switches$/"
+          },
+          "host": {
+            "filter": "/$switch/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "trigger": {
+            "filter": ""
+          },
+          "tags": {
+            "filter": ""
+          },
+          "proxy": {
+            "filter": ""
+          },
+          "showProblems": "problems",
+          "functions": [],
+          "options": {
+            "acknowledged": 2,
+            "minSeverity": 0,
+            "sortProblems": "default",
+            "hostsInMaintenance": true,
+            "useTimeRange": false,
+            "limit": 200,
+            "hostProxy": false
+          }
+        }
+      ],
+      "options": {
+        "renderMode": "data",
+        "content": "<div class=\"noc\"></div>",
+        "defaultContent": "<div class=\"noc\"></div>",
+        "afterRender": "/* NOC Evento - FRENTE DO SWITCH (Business Text, afterRender)\n * Queries: P = interfaces (status, tráfego, velocidade, erros) dos switches\n *          S = sistema (CPU, memória, temperatura, uptime, fontes/ventoinhas)\n *          F = problemas\n * Funciona com os templates oficiais \"Cisco IOS by SNMP\", \"Huawei VRP by SNMP\" e \"Network Generic Device by SNMP\":\n * item \"Interface <nome>(<descrição>): <métrica>\".\n */\nconst UTIL_ATENCAO = 70, UTIL_CRITICO = 90;   // % de uso da porta (maior sentido) para amarelo / vermelho\n\nconst ctx = (typeof context !== \"undefined\") ? context : {};\nconst root0 = ctx.element || (typeof element !== \"undefined\" ? element : document);\nconst root = (root0.querySelector && root0.querySelector(\".noc\")) || root0;\nconst isFrames = a => Array.isArray(a) && a.length && a[0] && Array.isArray(a[0].fields);\nfunction findSeries(o, d, seen) {\n  if (!o || typeof o !== \"object\" || d > 4 || seen.has(o)) return null; seen.add(o);\n  if (isFrames(o.series)) return o.series; if (isFrames(o)) return o;\n  for (const k of [\"panel\", \"panelData\", \"data\", \"series\"]) { const r = findSeries(o[k], d + 1, seen); if (r) return r; }\n  return null;\n}\nconst series = findSeries(ctx, 0, new Set()) || (typeof panelData !== \"undefined\" ? findSeries(panelData, 0, new Set()) : null) || [];\nconst esc = s => String(s == null ? \"\" : s).replace(/[&<>\"]/g, c => ({\"&\":\"&amp;\",\"<\":\"&lt;\",\">\":\"&gt;\",'\"':\"&quot;\"}[c]));\nconst vals = f => !f ? [] : (Array.isArray(f.values) ? f.values : (f.values && f.values.toArray ? f.values.toArray() : []));\nconst lastNN = a => { for (let i = a.length - 1; i >= 0; i--) if (a[i] != null && !Number.isNaN(a[i])) return a[i]; return null; };\nconst sName = (fr, f) => { const c = f.config || {}; return c.displayNameFromDS || c.displayName || fr.name || f.name || \"\"; };\nconst hostOf = (f, n) => { const l = f.labels || {}; return l.host || l.host_name || (n.includes(\": \") ? n.split(\": \")[0] : n); };\nconst itemOf = (f, n) => { const l = f.labels || {}; return l.item || (n.includes(\": \") ? n.split(\": \").slice(1).join(\": \") : n); };\n\n/* --- leitura --- */\nconst SW = {}, debug = [];\nlet problems = [], newest = 0;\nconst sw = h => (SW[h] = SW[h] || { n: h, ports: {}, cpu: null, mem: null, temp: [], up: null, psu: [], fan: [] });\nfor (const fr of series) {\n  const ref = fr.refId || \"\";\n  const tf = (fr.fields || []).find(f => f.type === \"time\");\n  if (tf && ref !== \"F\") { const t = lastNN(vals(tf)); if (t > newest) newest = t; }\n  for (const f of fr.fields || []) {\n    const v = vals(f);\n    debug.push(`[${ref}] ${sName(fr, f)} type=${f.type} n=${v.length}`);\n    if (ref === \"F\") { if (v.length && typeof v[0] === \"object\" && v[0] !== null) problems = problems.concat(v); continue; }\n    if (f.type !== \"number\") continue;\n    const nm = sName(fr, f), h = hostOf(f, nm), it = itemOf(f, nm), x = lastNN(v);\n    if (!h) continue;\n    const s = sw(h);\n    if (ref === \"P\") {\n      /* \"Interface <nome>(<descrição>): <métrica>\" ou \"Interface <nome>: <métrica>\"; o nome pode ter espaços e \":\" (Intelbras \"gigabitEthernet 1/0/1 : copper\") */\n      const m = it.match(/^Interface\\s+(.+):\\s*(Operational status|Bits received|Bits sent|Speed|Inbound packets with errors|Outbound packets with errors|Duplex status)$/i);\n      if (!m) continue;\n      const full = m[1].trim(), pa = full.match(/^(.*?)\\((.*)\\)$/);\n      const pn0 = pa ? pa[1].trim() : full, pn = normPort(pn0), alias = (pa ? pa[2] : \"\").replace(/^\\S+\\s+Interface$/i, \"\")  /* Intelbras: descrição padrão \"GigabitEthernet1/0/25 Interface\" = sem descrição */, met = m[2];\n      const p = s.ports[pn] = s.ports[pn] || { n: pn, fib: /:\\s*fiber\\s*$/i.test(pn0), alias, st: null, rx: null, tx: null, sp: null, ein: null, eout: null, dup: null, rxH: [], txH: [] };\n      if (/Operational status/i.test(met)) p.st = x;\n      else if (/Bits received/i.test(met)) { p.rx = x; p.rxH = v.filter(n => n != null).slice(-60); }\n      else if (/Bits sent/i.test(met)) { p.tx = x; p.txH = v.filter(n => n != null).slice(-60); }\n      else if (/Speed/i.test(met)) p.sp = x;\n      else if (/Inbound packets with errors/i.test(met)) p.ein = x;\n      else if (/Outbound packets with errors/i.test(met)) p.eout = x;\n      else if (/Duplex/i.test(met)) p.dup = x;\n    } else if (ref === \"S\") {\n      if (/CPU utilization/i.test(it)) s.cpu = s.cpu == null ? x : Math.max(s.cpu, x);\n      else if (/Memory utilization/i.test(it)) s.mem = s.mem == null ? x : Math.max(s.mem, x);\n      else if (/Temperature/i.test(it)) s.temp.push({ n: it.replace(/:\\s*Temperature.*/i, \"\"), v: x });\n      else if (/Uptime/i.test(it)) s.up = s.up == null ? x : Math.max(s.up, x);\n      else if (/Power supply status/i.test(it)) s.psu.push({ n: it.replace(/:\\s*Power supply status.*/i, \"\"), v: x });\n      else if (/Fan status/i.test(it)) s.fan.push({ n: it.replace(/:\\s*Fan status.*/i, \"\"), v: x });\n    }\n  }\n}\nconst P = problems.map(p => { const hs = p.hosts && p.hosts[0]; let ts = Number(p.lastchange || p.timestamp || 0); if (ts > 1e12) ts /= 1000;\n  return { h: (hs && (hs.name || hs.host)) || p.host || \"?\", p: p.name || p.description || \"\", sev: Number(p.severity != null ? p.severity : p.priority) || 0, ts }; });\n\nconst LIST = Object.values(SW).filter(s => Object.keys(s.ports).length).sort((a, b) => a.n.localeCompare(b.n));\nif (!LIST.length) {\n  root.innerHTML = `<div class=\"dbg\">Switch: nenhuma interface reconhecida.\\nConfira se o host tem o template oficial do fabricante e se a descoberta de interfaces já rodou (Latest data → \"Interface ...\").\\n\\n${esc(debug.slice(0, 80).join(\"\\n\") || \"Nenhum dado recebido.\")}</div>`;\n  return;\n}\n\n/* --- portas físicas e layout --- */\n/* nomes de porta fora do padrão: Intelbras \"gigabitEthernet 1/0/1 : copper\" -> \"gigabitEthernet1/0/1\"; \"ge1\" (1 número) conta como física */\nfunction normPort(n) { return String(n).trim().replace(/\\s*:\\s*(copper|fiber|combo)\\s*$/i, \"\").replace(/^([A-Za-z-]+)\\s+(?=\\d)/, \"$1\"); }\nfunction isPhys(n) { const k = (n.match(/\\d+/g) || []).length; return PHYS.test(n) && (k >= 2 || /^(ge|fe|xe|port)\\d+$/i.test(n)); }\nconst SFP = /^(Te|Tw|Fo|Hu|TenGig|TwentyFive|Forty|Hundred|XGigabit|XGE|25GE|40GE|100GE|sfp|qsfp)/i;\nconst PHYS = /^\\d+\\/\\d+\\/\\d+$|^(Gi|Fa|Te|Tw|Fo|Hu|GigabitEthernet|FastEthernet|TenGigabitEthernet|TwentyFiveGig|FortyGig|HundredGig|XGigabitEthernet|XGE|MultiGE|Ethernet|ether|sfp|qsfp|25GE|40GE|100GE|GE)\\S*?\\d/i;\nfunction parse(pn) {\n  const nums = (pn.match(/\\d+/g) || []).map(Number);\n  const port = nums.length ? nums[nums.length - 1] : 0;\n  const unit = nums.length >= 3 ? nums[0] : (nums.length === 2 ? 0 : 0);\n  const mod = nums.length >= 3 ? nums[nums.length - 2] : (nums.length === 2 ? nums[0] : 0);\n  return { unit, mod, port, sfp: SFP.test(pn) };\n}\nconst short = pn => pn.replace(/^GigabitEthernet/i, \"Gi\").replace(/^XGigabitEthernet/i, \"XGE\").replace(/^TenGigabitEthernet/i, \"Te\").replace(/^FastEthernet/i, \"Fa\");\nconst util = p => (p.sp && p.sp > 0) ? Math.max(p.rx || 0, p.tx || 0) / p.sp * 100 : null;\nconst bps = b => { if (b == null) return \"—\"; const u = [\"bps\", \"Kbps\", \"Mbps\", \"Gbps\", \"Tbps\"]; let i = 0; while (b >= 1000 && i < 4) { b /= 1000; i++; } return b.toFixed(i ? 1 : 0) + \" \" + u[i]; };\nconst spd = b => !b ? \"—\" : b >= 1e9 ? (b / 1e9) + \"G\" : (b / 1e6) + \"M\";\nconst ST = { 1: \"up\", 2: \"down\", 3: \"testing\", 4: \"unknown\", 5: \"dormant\", 6: \"notPresent\", 7: \"lowerLayerDown\" };\nfunction pstate(p) {\n  if (p.st === 1) { const u = util(p); if ((p.ein || 0) + (p.eout || 0) > 0) return \"err\"; if (u != null && u >= UTIL_CRITICO) return \"hot\"; if (u != null && u >= UTIL_ATENCAO) return \"warm\"; return (p.rx || 0) + (p.tx || 0) > 100000 ? \"busy\" : \"up\"; }\n  return p.st == null ? \"unk\" : \"down\";\n}\n\nfunction physOf(s) {\n  const pos = {};\n  Object.values(s.ports).filter(p => isPhys(p.n)).forEach(p => {\n    const q = parse(p.n), k = (q.mod > 0 ? \"\" : p.n.replace(/[\\d\\/.:]+$/, \"\")) + q.unit + \"/\" + q.mod + \"/\" + q.port, cur = pos[k];\n    const score = x => (x.st === 1 ? 2 : 0) + (SFP.test(x.n) ? 1 : 0);\n    if (!cur || score(p) > score(cur)) pos[k] = p;\n  });\n  return Object.values(pos);\n}\nfunction chassis(s) {\n  // físicas com pelo menos 2 números (descarta Fa0/mgmt). Módulo de uplink do 3750-X aparece como Gi e Te na mesma\n  // posição: fica uma só por posição (a que estiver up; empate = Te)\n  const pos = {};\n  Object.values(s.ports).filter(p => isPhys(p.n)).forEach(p => {\n    const q = parse(p.n), k = (q.mod > 0 ? \"\" : p.n.replace(/[\\d\\/.:]+$/, \"\")) + q.unit + \"/\" + q.mod + \"/\" + q.port, cur = pos[k];\n    const score = x => (x.st === 1 ? 2 : 0) + (SFP.test(x.n) ? 1 : 0);\n    if (!cur || score(p) > score(cur)) pos[k] = p;\n  });\n  const phys = Object.values(pos);\n  const units = {};\n  phys.forEach(p => { const q = parse(p.n); (units[q.unit] = units[q.unit] || []).push(Object.assign(p, q, p.fib ? { sfp: true } : {})); });\n  // módulo de uplink = qualquer módulo acima do primeiro da unidade (Cisco Gi4/1/x sobre Gi4/0/x; Ruckus ICX 1/2/x sobre 1/1/x)\n  Object.values(units).forEach(ps => { const m0 = Math.min(...ps.map(p => p.mod)); ps.forEach(p => { if (p.mod > m0) p.sfp = true; }); });\n  return Object.keys(units).sort((a, b) => a - b).map(u => {\n    const ps = units[u];\n    // portas \"principais\" = módulo com mais portas e não-SFP; o resto vai para o bloco de uplink à direita\n    const byMod = {}; ps.forEach(p => (byMod[p.mod + (p.sfp ? \"s\" : \"\")] = byMod[p.mod + (p.sfp ? \"s\" : \"\")] || []).push(p));\n    const mainKey = Object.keys(byMod).filter(k => !k.endsWith(\"s\")).sort((a, b) => byMod[b].length - byMod[a].length)[0];\n    const main = (byMod[mainKey] || []).sort((a, b) => a.port - b.port);\n    const up = ps.filter(p => !main.includes(p)).sort((a, b) => (a.mod - b.mod) || (a.port - b.port));\n    const upTop = up.filter(p => p.port % 2 === 1), upBot = up.filter(p => p.port % 2 === 0);\n    const port = p => { const st = pstate(p); return `<div class=\"pt ${p.sfp ? \"sfp\" : \"rj\"} ${st}\" data-sw=\"${esc(s.n)}\" data-p=\"${esc(p.n)}\"><span>${p.port}</span></div>`; };\n    // odd em cima, par embaixo, em grupos de 12 (como o painel frontal)\n    const top = main.filter(p => p.port % 2 === 1), bot = main.filter(p => p.port % 2 === 0);\n    const groups = [];\n    for (let i = 0; i < Math.max(top.length, bot.length); i += 6)\n      groups.push(`<div class=\"swg\"><div class=\"swr\">${top.slice(i, i + 6).map(port).join(\"\")}</div><div class=\"swr\">${bot.slice(i, i + 6).map(port).join(\"\")}</div></div>`);\n    const upHtml = up.length ? `<div class=\"swg upl\"><div class=\"swr\">${upTop.map(port).join(\"\")}</div><div class=\"swr\">${upBot.map(port).join(\"\")}</div></div>` : \"\";\n    return `<div class=\"chassis\"><div class=\"unit\">${Object.keys(units).length > 1 ? \"membro \" + u : \"\"}</div><div class=\"face\">${groups.join(\"\")}${upHtml}</div></div>`;\n  }).join(\"\");\n}\n\nconst age = ts => { if (!ts) return \"\"; let x = Math.floor(Date.now() / 1000 - ts); const d = Math.floor(x / 86400), h = Math.floor(x % 86400 / 3600), m = Math.floor(x % 3600 / 60); return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m`; };\nconst dur = x => { if (x == null) return \"—\"; x = Math.floor(x); const d = Math.floor(x / 86400), h = Math.floor(x % 86400 / 3600); return d ? `${d}d ${h}h` : `${h}h ${Math.floor(x % 3600 / 60)}m`; };\nconst SEV = [\"N/C\", \"Info\", \"Warning\", \"Average\", \"High\", \"Disaster\"], SEVC = [\"#6b7280\", \"#38bdf8\", \"#f5b301\", \"#fb923c\", \"#ef4444\", \"#b91c1c\"];\n\nconst html = LIST.map(s => {\n  const ps = physOf(s);\n  const nUp = ps.filter(p => p.st === 1).length, nErr = ps.filter(p => p.st === 1 && (p.ein || 0) + (p.eout || 0) > 0).length;\n  const rx = ps.reduce((a, p) => a + (p.rx || 0), 0), tx = ps.reduce((a, p) => a + (p.tx || 0), 0);\n  const top = ps.filter(p => p.st === 1).sort((a, b) => ((b.rx || 0) + (b.tx || 0)) - ((a.rx || 0) + (a.tx || 0))).slice(0, 6);\n  const pr = P.filter(p => p.h === s.n).sort((a, b) => b.sev - a.sev);\n  const temp = s.temp.filter(t => t.v != null).sort((a, b) => b.v - a.v)[0];\n  const bad = arr => arr.filter(x => x.v != null && x.v !== 1).length;   // ENTITY/CISCO-ENVMON: 1 = normal\n  return `<section class=\"swc ${pr.some(p => p.sev >= 4) ? \"crit\" : pr.length ? \"warn\" : \"ok\"}\">\n    <div class=\"swh\"><b>${esc(s.n)}</b>\n      <span class=\"kv\">portas up <em>${nUp}/${ps.length}</em></span>\n      <span class=\"kv\">tráfego ↓ <em>${bps(rx)}</em> ↑ <em>${bps(tx)}</em></span>\n      <span class=\"kv\">CPU <em>${s.cpu == null ? \"—\" : Math.round(s.cpu) + \"%\"}</em></span>\n      <span class=\"kv\">MEM <em>${s.mem == null ? \"—\" : Math.round(s.mem) + \"%\"}</em></span>\n      ${temp ? `<span class=\"kv\">temp <em class=\"${temp.v >= 55 ? \"hot\" : \"\"}\">${Math.round(temp.v)}°C</em></span>` : \"\"}\n      <span class=\"kv\">uptime <em>${dur(s.up)}</em></span>\n      ${s.psu.length ? `<span class=\"kv\">fontes <em class=\"${bad(s.psu) ? \"hot\" : \"\"}\">${s.psu.length - bad(s.psu)}/${s.psu.length} ok</em></span>` : \"\"}\n      ${s.fan.length ? `<span class=\"kv\">ventoinhas <em class=\"${bad(s.fan) ? \"hot\" : \"\"}\">${s.fan.length - bad(s.fan)}/${s.fan.length} ok</em></span>` : \"\"}\n      ${nErr ? `<span class=\"tag warn\">${nErr} porta(s) com erro</span>` : \"\"}</div>\n    ${chassis(s)}\n    <div class=\"swb\"><div class=\"tops\"><div class=\"nk-t\">Portas com mais tráfego</div>${top.map(p => `<div class=\"tp\" data-sw=\"${esc(s.n)}\" data-p=\"${esc(p.n)}\"><span>${esc(short(p.n))}</span><span class=\"al\">${esc(p.alias)}</span><span>↓ ${bps(p.rx)}</span><span>↑ ${bps(p.tx)}</span><span>${util(p) == null ? \"\" : Math.round(util(p)) + \"%\"}</span></div>`).join(\"\") || `<div class=\"nk-empty\">sem tráfego</div>`}</div>\n      <div class=\"prs\"><div class=\"nk-t\">Problemas (${pr.length})</div>${pr.slice(0, 6).map(p => `<div class=\"nk-pr\"><span class=\"sev\" style=\"color:${SEVC[p.sev]}\">${SEV[p.sev]}</span>${esc(p.p)}<span class=\"nk-age\">${age(p.ts)}</span></div>`).join(\"\") || `<div class=\"nk-empty\">Nenhum</div>`}</div></div>\n  </section>`;\n}).join(\"\");\n\nconst fmtH = t => new Date(t).toLocaleTimeString(\"pt-BR\");\nroot.innerHTML = `<div class=\"topbar\"><span>● Switches de borda · ${newest ? \"dados de \" + fmtH(newest) : \"sem timestamp\"}</span><span>tela renderizada às ${fmtH(Date.now())}</span></div>\n  <div class=\"lgd\"><span class=\"pt rj up\"></span>up <span class=\"pt rj busy\"></span>com tráfego <span class=\"pt rj warm\"></span>uso ≥ ${UTIL_ATENCAO}% <span class=\"pt rj hot\"></span>uso ≥ ${UTIL_CRITICO}% <span class=\"pt rj err\"></span>erros <span class=\"pt rj down\"></span>down/vazia <span class=\"pt sfp up\"></span>SFP/uplink</div>\n  ${html}`;\n\n/* --- detalhe da porta no hover --- */\nfunction spark(a, b) {\n  const arr = [...(a || []), ...(b || [])]; if (arr.length < 4) return `<div class=\"nk-empty\">sem histórico</div>`;\n  const w = 300, h = 46, mx = Math.max(...arr, 1), line = (s, c) => { const st = w / Math.max(s.length - 1, 1); return `<polyline points=\"${s.map((v, i) => `${(i * st).toFixed(1)},${(h - v / mx * h).toFixed(1)}`).join(\" \")}\" fill=\"none\" stroke=\"${c}\" stroke-width=\"1.5\"/>`; };\n  return `<svg class=\"nk-spark\" style=\"height:46px\" viewBox=\"0 0 ${w} ${h}\" preserveAspectRatio=\"none\">${line(a || [], \"#38bdf8\")}${line(b || [], \"#a78bfa\")}</svg>`;\n}\nconst row = (k, v) => `<div class=\"nk-row\"><span>${k}</span><span>${v}</span></div>`;\nfunction detail(s, p) {\n  const st = pstate(p), col = { up: \"#22c55e\", busy: \"#16a34a\", warm: \"#f5b301\", hot: \"#ef4444\", err: \"#fb923c\", down: \"#475569\", unk: \"#475569\" }[st];\n  const u = util(p);\n  return `<div class=\"nk-head\" style=\"border-color:${col}\"><div><b>${esc(p.n)}</b><div class=\"nk-sub\">${esc(s.n)}${p.alias ? \" · \" + esc(p.alias) : \"\"}</div></div>\n    <span class=\"badge\" style=\"background:${col}\">${(ST[p.st] || \"—\").toUpperCase()}</span></div>\n    <div class=\"nk-sec\"><div class=\"nk-t\">Tráfego · última hora (↓ azul, ↑ roxo)</div>${spark(p.rxH, p.txH)}\n      ${row(\"Recebido ↓\", bps(p.rx))}${row(\"Enviado ↑\", bps(p.tx))}${row(\"Velocidade\", spd(p.sp))}${row(\"Uso (maior sentido)\", u == null ? \"—\" : u.toFixed(1) + \"%\")}</div>\n    <div class=\"nk-sec\"><div class=\"nk-t\">Saúde</div>${row(\"Erros entrada\", p.ein == null ? \"—\" : p.ein.toFixed(2) + \" /s\")}${row(\"Erros saída\", p.eout == null ? \"—\" : p.eout.toFixed(2) + \" /s\")}\n      ${p.dup != null ? row(\"Duplex\", p.dup === 3 ? \"full\" : p.dup === 2 ? \"HALF\" : \"—\") : \"\"}</div>`;\n}\nroot.style.position = \"relative\";\nlet tip = root.querySelector(\".nk-card\"); if (!tip) { tip = document.createElement(\"div\"); tip.className = \"nk-card\"; root.appendChild(tip); }\nlet tipFor = null;\nroot.onmousemove = e => {\n  const c = e.target.closest(\"[data-p]\"); if (!c) { tip.style.display = \"none\"; tipFor = null; return; }\n  const s = SW[c.dataset.sw], p = s && s.ports[c.dataset.p]; if (!p) return;\n  const key = s.n + \"|\" + p.n; if (tipFor !== key) { tip.innerHTML = detail(s, p); tipFor = key; }\n  tip.style.display = \"block\";\n  posTip(tip, e, root, 18);\n};\nroot.onmouseleave = () => { tip.style.display = \"none\"; tipFor = null; };\n\n/* posição do cartão do cursor: dentro da área VISÍVEL do painel (o Grafana corta o que passa da borda do painel, não da janela) */\nfunction posTip(tip, e, root, dx) {\n  const B = { left: 0, top: 0, right: innerWidth, bottom: innerHeight };\n  for (let p = root; p && p !== document.body; p = p.parentElement) {\n    const cs = getComputedStyle(p);\n    if (/(hidden|auto|scroll|clip)/.test(cs.overflow + cs.overflowX + cs.overflowY)) { const q = p.getBoundingClientRect();\n      B.left = Math.max(B.left, q.left); B.top = Math.max(B.top, q.top); B.right = Math.min(B.right, q.right); B.bottom = Math.min(B.bottom, q.bottom); }\n  }\n  tip.style.maxHeight = Math.max(120, B.bottom - B.top - 16) + \"px\"; tip.style.overflowY = \"auto\";\n  const r = root.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;\n  let vx = e.clientX + dx, vy = e.clientY + 12;\n  if (vx + tw > B.right - 8) vx = e.clientX - tw - dx;     // sem espaço à direita: abre à esquerda do cursor\n  if (vx < B.left + 8) vx = B.left + 8;\n  if (vy + th > B.bottom - 8) vy = e.clientY - th - 12;    // sem espaço embaixo: abre acima\n  if (vy + th > B.bottom - 8) vy = B.bottom - 8 - th;\n  if (vy < B.top + 8) vy = B.top + 8;\n  tip.style.left = (vx - r.left + root.scrollLeft) + \"px\"; tip.style.top = (vy - r.top + root.scrollTop) + \"px\";\n}\n",
+        "styles": ".noc{--line:#223049;--ink:#e6edf7;--ink2:#9fb0c8;--mute:#64748b;--ok:#22c55e;--warn:#f5b301;--crit:#ef4444;--accent:#38bdf8;--bar:#3b82f6;color:var(--ink);font:13px/1.35 \"Segoe UI\",Roboto,Arial,sans-serif;min-height:100%;overflow:visible;position:relative}\n.noc *{box-sizing:border-box}\n.noc .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}\n.noc .kpi{background:#111827;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:6px;padding:8px 10px}\n.noc .kpi .l{font-size:10px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px}\n.noc .kpi .v{font:700 24px/1.1 Consolas,monospace;margin-top:2px}\n.noc .kpi .v span{font-size:13px;color:var(--ink2);font-weight:400}\n.noc .kpi .s{font-size:10px;color:var(--mute)}\n.noc .kpi.ok{border-left-color:var(--ok)}.noc .kpi.warn{border-left-color:var(--warn)}.noc .kpi.crit{border-left-color:var(--crit)}\n.noc .main{display:grid;grid-template-columns:1fr 340px;gap:12px}\n.noc .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;align-content:start}\n.noc .card{background:#141c2b;border:1px solid var(--line);border-top:3px solid var(--ok);border-radius:6px;padding:8px 10px;cursor:pointer}\n.noc .card:hover{border-color:var(--accent)}\n.noc .card.warn{border-top-color:var(--warn)}.noc .card.crit{border-top-color:#fb923c}.noc .card.crit .dot{background:#fb923c}.noc .card.crit .issue{background:rgba(251,146,60,.16);color:#fdba74}\n.noc .card.down{border-top-color:var(--crit);background:#1d1418}.noc .card.down .dot{background:var(--crit)}.noc .card.down .issue{background:rgba(239,68,68,.18);color:#fca5a5}\n.noc .card.focus{outline:2px solid var(--accent)}\n.noc .ch{display:flex;align-items:center;gap:6px;font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.noc .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--ok)}\n.noc .warn .dot{background:var(--warn)}.noc .crit .dot{background:var(--crit)}\n.noc .sub{font-size:10px;color:var(--mute);margin:1px 0 6px}\n.noc .issue{font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;margin-bottom:6px;display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.noc .warn .issue{background:rgba(245,179,1,.15);color:#fcd34d}.noc .crit .issue{background:rgba(239,68,68,.18);color:#fca5a5}\n.noc .m{display:grid;grid-template-columns:44px 1fr 42px;align-items:center;gap:6px;font-size:11px;margin:3px 0}\n.noc .m .n{color:var(--ink2)}.noc .m .val{text-align:right;font-family:Consolas,monospace}\n.noc .track{height:6px;background:#1f2a3d;border-radius:3px;overflow:hidden}\n.noc .fill{height:100%;border-radius:3px;background:var(--bar)}\n.noc .fill.w{background:var(--warn)}.noc .fill.c{background:var(--crit)}\n.noc .foot{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-top:6px;border-top:1px solid var(--line);padding-top:5px}\n.noc .off .val,.noc .off .track{opacity:.35}\n.noc .side{display:flex;flex-direction:column;gap:12px}\n.noc .box{background:#111827;border:1px solid var(--line);border-radius:6px}\n.noc .box h2{margin:0;padding:8px 10px;font-size:12px;display:flex;justify-content:space-between;border-bottom:1px solid var(--line)}\n.noc .box h2 .c{background:var(--crit);color:#fff;border-radius:10px;padding:0 7px;font-size:11px}\n.noc .box h2 .c.z{background:var(--ok)}\n.noc .q{list-style:none;margin:0;padding:0;max-height:320px;overflow:auto}\n.noc .q li{display:grid;grid-template-columns:4px 1fr auto;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);cursor:pointer}\n.noc .q li:hover{background:#18233a}\n.noc .q .bar{border-radius:2px}.noc .q .h{font-weight:600;font-size:12px}.noc .q .p{font-size:11px;color:var(--ink2)}\n.noc .q .t{font-size:10px;color:var(--mute);white-space:nowrap}\n.noc .q .empty{display:block;padding:10px;color:var(--mute)}\n.noc .sev{font-size:9px;font-weight:700;text-transform:uppercase;margin-right:4px}\n.noc .spot{padding:10px}\n.noc .spot .title{display:flex;justify-content:space-between;align-items:center}\n.noc .spot .title b{font-size:16px}\n.noc .badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;color:#000}\n.noc .spot table{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px}\n.noc .spot td{padding:3px 0;border-bottom:1px solid var(--line)}.noc .spot td:last-child{text-align:right;font-family:Consolas,monospace}\n.noc .dbg{font:11px Consolas,monospace;color:#fcd34d;white-space:pre-wrap;background:#111827;padding:10px;border:1px solid var(--line);border-radius:6px}\n@media (max-width:1100px){.noc .main{grid-template-columns:1fr}.noc .kpis{grid-template-columns:repeat(3,1fr)}}\n.noc .spot table,.noc .spot tr,.noc .spot td{border:0!important;background:transparent!important}\n.noc .spot td{border-bottom:1px solid var(--line)!important;padding:3px 0!important}\n\n.noc .nk-card{position:absolute;z-index:50;display:none;width:360px;pointer-events:none;background:#0f172a;border:1px solid #2b3b57;border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.6);font-size:11px;overflow:hidden}\n.noc .nk-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:10px 12px;border-left:4px solid;background:#111b2e}\n.noc .nk-head b{font-size:14px}.noc .nk-sub{color:var(--mute);font-size:10px;margin-top:2px}\n.noc .nk-sec{padding:8px 12px;border-top:1px solid var(--line)}\n.noc .nk-t{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink2);margin-bottom:5px}\n.noc .nk-row{display:flex;justify-content:space-between;padding:2px 0}.noc .nk-row span:last-child{font-family:Consolas,monospace}\n.noc .nk-res{display:grid;grid-template-columns:90px 1fr;align-items:center;gap:8px;margin-bottom:4px}\n.noc .nk-res span{display:block;color:var(--ink2);font-size:10px}.noc .nk-res b{font:700 16px Consolas,monospace}\n.noc .nk-res b.w{color:var(--warn)}.noc .nk-res b.c{color:var(--crit)}\n.noc .nk-spark{width:100%;height:28px;display:block}\n.noc .nk-empty{color:var(--mute);font-size:10px}\n.noc .nk-disk{display:grid;grid-template-columns:120px 1fr 40px;align-items:center;gap:6px;margin:3px 0}\n.noc .nk-disk span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.noc .nk-disk span:last-child{text-align:right;font-family:Consolas,monospace}\n.noc .nk-pr{padding:2px 0;display:flex;gap:4px;align-items:baseline}.noc .nk-age{margin-left:auto;color:var(--mute);white-space:nowrap}\n\n.noc .disks .m{margin:2px 0;font-size:10px}.noc .disks .track{height:5px}\n.noc .m .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.noc .nk-card{max-height:calc(100vh - 16px);overflow-y:auto}\n\n.noc .fwl{display:flex;justify-content:space-between;font-size:11px;margin:3px 0}.noc .fwl span{color:var(--ink2)}.noc .fwl b{font:600 11px Consolas,monospace}\n.noc .fwl b.okc{color:var(--ok)}.noc .fwl b.bad{color:var(--crit)}\n.noc .nk-if{display:grid;grid-template-columns:10px 1fr 80px 80px;gap:6px;align-items:center;margin:2px 0}\n.noc .nk-if span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.noc .nk-if span:nth-child(n+3){text-align:right;font-family:Consolas,monospace}\n.noc .nk-if .d{width:7px;height:7px;border-radius:50%;background:var(--mute)}.noc .nk-if .d.up{background:var(--ok)}.noc .nk-if .d.dn{background:var(--crit)}\n\n.noc .stale{background:#7f1d1d;border:1px solid var(--crit);color:#fff;font-weight:700;padding:10px 14px;border-radius:6px;margin-bottom:8px;animation:nocblink 1.6s infinite}\n@keyframes nocblink{50%{opacity:.75}}\n.noc .topbar{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-bottom:6px}.noc .topbar .bad{color:var(--crit);font-weight:700}\n.noc .sites{background:#111827;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:12px}\n.noc .sites .sh{display:flex;gap:10px;align-items:baseline;font-size:12px;margin-bottom:6px}.noc .sites .sh span{color:var(--ink2);font-size:11px}.noc .sites .sh em{color:var(--warn);font-style:normal}\n.noc .chips{display:flex;flex-wrap:wrap;gap:6px}\n.noc .chip{display:flex;align-items:center;gap:6px;background:#141c2b;border:1px solid var(--line);border-left:3px solid var(--ok);border-radius:4px;padding:4px 8px;font-size:11px}\n.noc .chip.warn{border-left-color:var(--warn)}.noc .chip.crit{border-left-color:var(--crit);background:#1d1418}.noc .chip.unk{border-left-color:var(--mute)}\n.noc .chip .dot{width:7px;height:7px}.noc .chip.unk .dot{background:var(--mute)}\n.noc .chip .sn{font-weight:600}.noc .chip .sm{color:var(--ink2);font-family:Consolas,monospace;font-size:10px}.noc .chip .sm.hot{color:var(--warn);font-weight:700}\n.noc .card.maint{border-top-color:#6b7280;opacity:.6}.noc .card.maint .dot{background:#6b7280}\n.noc .card.maint .issue{background:rgba(107,114,128,.25);color:#cbd5e1}\n.noc .q li.mt{opacity:.55}.noc .mtag{font-size:9px;font-weight:600;background:#374151;color:#cbd5e1;border-radius:3px;padding:0 5px;margin-left:4px}\n\n.noc .dmore{font-size:10px;color:var(--mute);text-align:right;margin-top:1px}\n.noc .chip.cert{border-left-color:#fb923c}.noc .chip.cert .dot{background:#fb923c}.noc .chip .sm.hot{color:#fb923c}.noc .chip .sm.venc{color:var(--crit);font-weight:700}\n.noc .sites .sh em.bad{color:var(--crit);font-weight:700}\n.noc .wanb{margin-top:4px;border-top:1px dashed var(--line);padding-top:4px}.noc .fwl.wan span{display:inline-flex;align-items:center;gap:5px}\n.noc .fwl.wan .wd{width:7px;height:7px;border-radius:50%;background:var(--mute);display:inline-block}.noc .fwl.wan .wd.up{background:var(--ok)}.noc .fwl.wan .wd.dn{background:var(--crit)}\n.noc .fwl.wan .tr{color:var(--ink2);font-weight:400;font-size:10px}\n\n/* --- frente do switch --- */\n.noc .lgd{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:10px;color:var(--ink2);margin-bottom:10px}\n.noc .lgd .pt{width:14px;height:12px;cursor:default}\n.noc .swc{background:#111827;border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:6px;padding:10px 12px;margin-bottom:12px}\n.noc .swc.warn{border-left-color:var(--warn)}.noc .swc.crit{border-left-color:var(--crit)}\n.noc .swh{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:10px}\n.noc .swh b{font-size:15px}.noc .swh .kv{font-size:11px;color:var(--ink2)}.noc .swh .kv em{font:700 12px Consolas,monospace;color:var(--ink);font-style:normal}\n.noc .swh .kv em.hot{color:#fca5a5}\n.noc .chassis{margin-bottom:8px}\n.noc .unit{font-size:10px;color:var(--mute);margin-bottom:2px}\n.noc .face{display:flex;gap:12px;align-items:center;flex-wrap:wrap;overflow-x:auto;background:linear-gradient(180deg,#2a3140,#1c222e);border:1px solid #3a4456;border-radius:6px;padding:10px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 8px rgba(0,0,0,.4)}\n.noc .swg{display:flex;flex-direction:column;gap:4px;flex:none;margin:0;padding:0;width:auto}\n.noc .swg.upl{margin-left:auto;padding-left:14px;border-left:1px dashed #4b5568}\n.noc .swr{display:flex;gap:4px;flex-wrap:nowrap;margin:0!important;padding:0;width:auto}\n.noc .pt{flex:none;margin:0;box-sizing:border-box;position:relative;width:30px;height:24px;border-radius:3px;background:#0b0f17;border:1px solid #475569;display:flex;align-items:flex-end;justify-content:center;cursor:pointer}\n.noc .pt span{font:9px Consolas,monospace;color:#94a3b8;line-height:1;margin-bottom:2px}\n.noc .pt.rj::before{content:\"\";position:absolute;top:3px;left:50%;transform:translateX(-50%);width:12px;height:5px;border-radius:1px;background:currentColor;opacity:.9}\n.noc .pt.sfp{width:36px;border-radius:2px}\n.noc .pt.sfp::before{content:\"\";position:absolute;top:3px;left:5px;right:5px;height:6px;border:1px solid currentColor;border-radius:1px}\n.noc .pt.up{color:#22c55e;border-color:#16a34a;background:#0d1f15}\n.noc .pt.busy{color:#4ade80;border-color:#22c55e;background:#123a22;box-shadow:0 0 6px rgba(34,197,94,.45)}\n.noc .pt.warm{color:#facc15;border-color:#f5b301;background:#2e2608}\n.noc .pt.hot{color:#f87171;border-color:#ef4444;background:#3a1418;box-shadow:0 0 8px rgba(239,68,68,.55)}\n.noc .pt.err{color:#fb923c;border-color:#fb923c;background:#2e1a0c}\n.noc .pt.down,.noc .pt.unk{color:#334155;border-color:#334155}\n.noc .pt:hover{outline:2px solid var(--accent);z-index:2}\n.noc .swb{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-top:8px}\n.noc .tp{display:grid;grid-template-columns:70px 1fr 90px 90px 40px;gap:6px;font-size:11px;padding:2px 0;border-bottom:1px solid var(--line);cursor:default}\n.noc .tp span:nth-child(n+3){font-family:Consolas,monospace;text-align:right}.noc .tp .al{color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n@media (max-width:1100px){.noc .swb{grid-template-columns:1fr}}\n",
+        "helpers": "",
+        "editors": [
+          "afterRender",
+          "styles"
+        ],
+        "wrap": false,
+        "contentPartials": [],
+        "editor": {
+          "format": "auto",
+          "language": "html"
+        }
+      }
+    }
+  ]
+}

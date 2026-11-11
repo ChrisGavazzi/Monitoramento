@@ -1,0 +1,395 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_ZABBIX",
+      "label": "Zabbix",
+      "description": "Datasource do Zabbix",
+      "type": "datasource",
+      "pluginId": "alexanderzobnin-zabbix-datasource",
+      "pluginName": "Zabbix"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "datasource",
+      "id": "alexanderzobnin-zabbix-datasource",
+      "name": "Zabbix",
+      "version": "4.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "marcusolsson-dynamictext-panel",
+      "name": "Business Text",
+      "version": "5.0.0"
+    }
+  ],
+  "title": "NOC Evento — Servidores e Rede",
+  "uid": "noc-evento-servidores",
+  "tags": [
+    "zabbix",
+    "noc",
+    "evento"
+  ],
+  "editable": true,
+  "graphTooltip": 0,
+  "refresh": "1m",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "description": "Zabbix do EVENTO. Grupos Evento/Servidores, Evento/Rede/*, Evento/Race Control. A inclui ICMP para hosts sem agente. Cards por servidor (Business Text). Queries: A agente, B CPU, C memória, D disco, E uptime, F problemas (inclui hosts em manutenção, mostrados em cinza), G detalhes/firewall, H sites e certificados (hosts SSL-*). Código em afterRender; limites no topo do código.",
+  "links": [
+    {
+      "type": "dashboards",
+      "tags": [
+        "evento"
+      ],
+      "asDropdown": false,
+      "includeVars": false,
+      "keepTime": false,
+      "title": "Evento",
+      "icon": "external link",
+      "targetBlank": false
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "host",
+        "label": "Equipamento",
+        "type": "query",
+        "datasource": {
+          "type": "alexanderzobnin-zabbix-datasource",
+          "uid": "${DS_ZABBIX}"
+        },
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1,
+        "sort": 1,
+        "regex": "",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "options": [],
+        "query": {
+          "queryType": 1,
+          "group": {
+            "filter": "/Evento\\/Servidores|Evento\\/Rede\\/(Roteador|Firewall)|Evento\\/Race Control|Zabbix servers/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "item": {
+            "filter": ""
+          },
+          "itemTag": {
+            "filter": ""
+          }
+        }
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 24,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "timeFrom": "2h",
+      "hideTimeOverride": true,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Evento\\/Servidores|Evento\\/Rede\\/(Roteador|Firewall)|Evento\\/Race Control|Zabbix servers/"
+          },
+          "host": {
+            "filter": "/$host/"
+          },
+          "item": {
+            "filter": "/Zabbix agent availability|SNMP agent availability|ICMP: disponível/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Evento\\/Servidores|Evento\\/Rede\\/(Roteador|Firewall)|Evento\\/Race Control|Zabbix servers/"
+          },
+          "host": {
+            "filter": "/$host/"
+          },
+          "item": {
+            "filter": "/.*CPU utilization/"
+          },
+          "itemTag": {
+            "filter": "component: cpu"
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Evento\\/Servidores|Evento\\/Rede\\/(Roteador|Firewall)|Evento\\/Race Control|Zabbix servers/"
+          },
+          "host": {
+            "filter": "/$host/"
+          },
+          "item": {
+            "filter": "/.*Memory utilization/"
+          },
+          "itemTag": {
+            "filter": "component: memory"
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Evento\\/Servidores|Evento\\/Rede\\/(Roteador|Firewall)|Evento\\/Race Control|Zabbix servers/"
+          },
+          "host": {
+            "filter": "/$host/"
+          },
+          "item": {
+            "filter": "/.*Space utilization.*|.*Used space in %.*|.*Space: Used, in %.*/"
+          },
+          "itemTag": {
+            "filter": "component: storage"
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Evento\\/Servidores|Evento\\/Rede\\/(Roteador|Firewall)|Evento\\/Race Control|Zabbix servers/"
+          },
+          "host": {
+            "filter": "/$host/"
+          },
+          "item": {
+            "filter": "/.*[Uu]ptime/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "G",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Evento\\/Servidores|Evento\\/Rede\\/(Roteador|Firewall)|Evento\\/Race Control|Zabbix servers/"
+          },
+          "host": {
+            "filter": "/$host/"
+          },
+          "item": {
+            "filter": "/Bits received|Bits sent|Number of cores|Number of CPUs|Total memory|Used memory|Available memory$|swap space in %|Number of processes$|CPU queue length|Load average \\(1m avg\\)|Operational status|States table|Source tracking table current|Firewall rules count|Packet filter running status/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "H",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/^SSL-/"
+          },
+          "item": {
+            "filter": "/Failed step of scenario|Response time for step|Cert: Expires on/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "5",
+          "group": {
+            "filter": "/Evento\\/Servidores|Evento\\/Rede\\/(Roteador|Firewall)|Evento\\/Race Control|Zabbix servers/"
+          },
+          "host": {
+            "filter": "/$host/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "trigger": {
+            "filter": ""
+          },
+          "tags": {
+            "filter": ""
+          },
+          "proxy": {
+            "filter": ""
+          },
+          "showProblems": "problems",
+          "functions": [],
+          "options": {
+            "acknowledged": 2,
+            "minSeverity": 0,
+            "sortProblems": "default",
+            "hostsInMaintenance": true,
+            "useTimeRange": false,
+            "limit": 200,
+            "hostProxy": false
+          }
+        }
+      ],
+      "options": {
+        "renderMode": "data",
+        "content": "<div class=\"noc\"></div>",
+        "defaultContent": "<div class=\"noc\"></div>",
+        "afterRender": "/* NOC Servidores - Business Text (afterRender)\n * Lê as queries do painel (refId):\n *   A = disponibilidade do agente   B = CPU   C = memória\n *   D = espaço em disco (% usado)   E = uptime   F = problemas (query de Problems)\n *   H = sites (hosts SSL-*): falha do scenario, tempo de resposta e vencimento do certificado\n *   G = detalhes p/ o card de hover: núcleos, memória total/usada, swap, processos,\n *       fila de CPU/load e tráfego de rede (Bits received/sent)\n *       + firewall pfSense (SNMP): tabela de estados (conexões), regras, status do PF\n *         e status/tráfego por interface. Hosts com \"States table\" viram card de firewall.\n * Para mudar limites de cor: LIMITE_ATENCAO / LIMITE_CRITICO.\n * Para mudar a rotação do destaque: ROTACAO_MS.\n */\nconst LIMITE_ATENCAO = 80, LIMITE_CRITICO = 90, ROTACAO_MS = 8000;\nconst ATRASO_MAX_MIN = 5;      // acima disso, faixa vermelha de \"dados atrasados\"\nconst CERT_ALERTA_DIAS = 7;    // certificado laranja abaixo disso; vermelho só depois de vencido (ou site fora)\n\n/* --- compatibilidade entre versões do plugin --- */\nconst ctx = (typeof context !== \"undefined\") ? context : {};\nconst root0 = ctx.element || (typeof element !== \"undefined\" ? element : document);\nconst root = (root0.querySelector && root0.querySelector(\".noc\")) || root0;\n// procura os data frames onde quer que a versão do plugin os coloque\nconst isFrames = a => Array.isArray(a) && a.length && a[0] && Array.isArray(a[0].fields);\nfunction findSeries(o, depth, seen) {\n  if (!o || typeof o !== \"object\" || depth > 4 || seen.has(o)) return null;\n  seen.add(o);\n  if (isFrames(o.series)) return o.series;\n  if (isFrames(o)) return o;\n  for (const k of [\"panel\", \"panelData\", \"data\", \"series\"]) { const r = findSeries(o[k], depth + 1, seen); if (r) return r; }\n  return null;\n}\nconst series = findSeries(ctx, 0, new Set())\n  || (typeof panelData !== \"undefined\" ? findSeries(panelData, 0, new Set()) : null)\n  || (typeof data !== \"undefined\" ? findSeries(data, 0, new Set()) : null) || [];\nconst ctxInfo = `context: ${Object.keys(ctx).join(\", \")}\\ncontext.panel: ${ctx.panel ? Object.keys(ctx.panel).join(\", \") : \"-\"}\\ncontext.data: ${Array.isArray(ctx.data) ? \"array(\" + ctx.data.length + \")\" : typeof ctx.data}`;\n\n/* --- helpers --- */\nconst esc = s => String(s == null ? \"\" : s).replace(/[&<>\"]/g, c => ({\"&\":\"&amp;\",\"<\":\"&lt;\",\">\":\"&gt;\",'\"':\"&quot;\"}[c]));\nconst vals = f => !f ? [] : (Array.isArray(f.values) ? f.values : (f.values && f.values.toArray ? f.values.toArray() : []));\nconst lastNN = arr => { for (let i = arr.length - 1; i >= 0; i--) if (arr[i] != null && !Number.isNaN(arr[i])) return arr[i]; return null; };\nfunction seriesName(frame, field) {\n  const c = field.config || {};\n  return c.displayNameFromDS || c.displayName || (field.state && field.state.displayName) || frame.name || field.name || \"\";\n}\nfunction hostOf(frame, field, name) {\n  const l = field.labels || {};\n  return l.host || l.host_name || (name.includes(\": \") ? name.split(\": \")[0] : name);\n}\nfunction itemOf(field, name) {\n  const l = field.labels || {};\n  return l.item || (name.includes(\": \") ? name.split(\": \").slice(1).join(\": \") : name);\n}\n\n// sistemas de arquivos virtuais (sempre 100% e sem significado): devfs do pfSense em chroots, /proc, /sys, /run, shm\nconst PSEUDO_FS = /(^|\\/)dev(\\/|$)|^\\/(proc|sys|run)(\\/|$)|\\/shm$/i;\nconst MAX_DISCOS = 2;   // discos mostrados no card (os mais cheios); todos aparecem no detalhe ao passar o mouse\nfunction diskName(item) {\n  let t = item.replace(/^(Windows|Linux):\\s*/i, \"\").replace(/:?\\s*(Space utilization|Space: Used, in %|Used space in %).*$/i, \"\");\n  let m = t.match(/^(.*?)\\s*\\(([A-Z]:)\\)\\s*$/); if (m) return m[2] + (m[1] ? \" \" + m[1] : \"\");\n  m = t.match(/\\[([^\\]]+)\\]/); if (m) { const x = m[1].match(/\\(([A-Z]:)\\)/); return x ? x[1] + (m[1].replace(/\\([A-Z]:\\)/, '').trim() ? ' ' + m[1].replace(/\\([A-Z]:\\)/, '').trim() : '') : m[1]; }\n  return t.replace(/^FS\\s*/i, \"\").replace(/:$/, \"\") || item;\n}\n\n/* --- leitura das métricas --- */\nconst H = {};\nconst host = n => (H[n] = H[n] || { n, os: \"\", st: null, cpu: null, mem: null, disks: {}, up: null, cpuH: [], memH: [], x: {}, rx: null, tx: null, ifs: {}, fw: false });\nlet problems = [];\nconst debug = [];\nlet newest = 0;                      // último timestamp recebido (ms) - para detectar tela congelada\nconst SITES = {};\nfor (const fr of series) {\n  const ref = fr.refId || \"\";\n  const tf = (fr.fields || []).find(f => f.type === \"time\");\n  if (tf && ref !== \"F\" && ref !== \"H\") { const t = lastNN(vals(tf)); if (t > newest) newest = t; }\n  for (const f of fr.fields || []) {\n    const v = vals(f);\n    debug.push(`[${ref}] frame=\"${fr.name || \"\"}\" field=\"${f.name}\" type=${f.type} labels=${JSON.stringify(f.labels || {})} n=${v.length}`);\n    if (ref === \"F\") {\n      // problemas: campo com objetos (formato do plugin) ou tabela\n      if (v.length && typeof v[0] === \"object\" && v[0] !== null) problems = problems.concat(v);\n      continue;\n    }\n    if (f.type !== \"number\") continue;\n    const name = seriesName(fr, f), h = hostOf(fr, f, name), item = itemOf(f, name), x = lastNN(v);\n    if (!h) continue;\n    if (ref === \"H\") {\n      const key = h.replace(/^SSL-/i, \"\").replace(/\\.$/, \"\");\n      const o = SITES[key] = SITES[key] || { n: key, fail: null, rt: null, exp: null, https: false, rtH: false };\n      const isH = /HTTPS/i.test(item);\n      if (/Failed step of scenario/i.test(item)) { if (isH || !o.https) { o.fail = x; if (isH) o.https = true; } }\n      else if (/Response time for step/i.test(item)) { if (isH || !o.rtH) { o.rt = x; if (isH) o.rtH = true; } }\n      else if (/Expires on/i.test(item)) o.exp = x;\n      continue;\n    }\n    const o = host(h);\n    if (/^Windows/i.test(item)) o.os = \"Windows\"; else if (/^Linux/i.test(item)) o.os = \"Linux\";\n    // A: disponibilidade do agente/SNMP e ICMP (mesma escala: 1 = ok, 0 = fora). Vale o pior: ping 0 derruba o card.\n    if (ref === \"A\") o.st = (o.st == null || x === 0 || (o.st === 2 && x === 1)) ? x : o.st;\n    else if (ref === \"B\") { o.cpu = x; o.cpuH = v.filter(n => n != null).slice(-60); }\n    else if (ref === \"C\") {\n      if (/swap|virtual/i.test(item)) continue;\n      const phys = /physical/i.test(item);\n      if (phys || !o.memPhys) { o.mem = x; o.memH = v.filter(n => n != null).slice(-60); if (phys) o.memPhys = true; }\n    }\n    else if (ref === \"E\") o.up = x;\n    else if (ref === \"D\") { const dn = diskName(item); if (!PSEUDO_FS.test(dn)) o.disks[dn] = x; }\n    else if (ref === \"G\") {\n      const it = item.replace(/^(Windows|Linux):\\s*/i, \"\");\n      const wm = it.match(/^WAN\\s+(.+?):\\s*internet\\b/i);\n      if (wm) { o.wan = o.wan || {}; o.wan[wm[1].trim().toUpperCase()] = x; continue; }\n      const ifm = it.match(/Interface\\s+\\[?(.+?)\\]?:\\s*(Bits received|Bits sent|Operational status)/i);\n      if (ifm) {\n        const n = ifm[1], skip = /^(lo|pflog|pfsync|enc|ovpn[cs]?\\d*$)/i.test(n);\n        const I = o.ifs[n] = o.ifs[n] || { rx: null, tx: null, st: null };\n        if (/received/i.test(ifm[2])) { I.rx = x; if (!skip) o.rx = (o.rx || 0) + (x || 0); }\n        else if (/sent/i.test(ifm[2])) { I.tx = x; if (!skip) o.tx = (o.tx || 0) + (x || 0); }\n        else I.st = x;\n      }\n      else if (/Bits received/i.test(it)) o.rx = (o.rx || 0) + (x || 0);\n      else if (/Bits sent/i.test(it)) o.tx = (o.tx || 0) + (x || 0);\n      else if (/States table current/i.test(it)) { o.x.states = x; o.fw = true; }\n      else if (/States table limit/i.test(it)) { o.x.statesMax = x; o.fw = true; }\n      else if (/States table utilization/i.test(it)) { o.x.statesPct = x; o.fw = true; }\n      else if (/Source tracking table current/i.test(it)) o.x.srcTrack = x;\n      else if (/Firewall rules count/i.test(it)) o.x.rules = x;\n      else if (/Packet filter running status/i.test(it)) o.x.pf = x;\n      else if (/Number of (cores|CPUs)/i.test(it)) o.x.cores = x;\n      else if (/^Total memory/i.test(it)) o.x.memTotal = x;\n      else if (/^Used memory/i.test(it)) o.x.memUsed = x;\n      else if (/^Available memory$/i.test(it)) o.x.memAvail = x;\n      else if (/swap.*%/i.test(it)) o.x.swapFree = x;\n      else if (/Number of processes$/i.test(it)) o.x.procs = x;\n      else if (/CPU queue length/i.test(it)) o.x.queue = x;\n      else if (/Load average \\(1m/i.test(it)) o.x.load = x;\n      else if (/uptime/i.test(it) && o.up == null) o.up = x;\n    }\n  }\n}\n// problemas em formato de tabela (fallback)\nif (!problems.length) {\n  const fr = series.find(s => s.refId === \"F\");\n  if (fr) {\n    const g = n => (fr.fields || []).find(f => new RegExp(n, \"i\").test(f.name));\n    const fh = g(\"^host\"), fd = g(\"desc|name|problem\"), fs = g(\"sever|prior\"), ft = g(\"time|lastchange|clock\");\n    const len = fd ? vals(fd).length : 0;\n    for (let i = 0; i < len; i++) problems.push({ host: fh && vals(fh)[i], name: vals(fd)[i], severity: fs && vals(fs)[i], lastchange: ft && vals(ft)[i] });\n  }\n}\nconst P = problems.map(p => {\n  const hs = p.hosts && p.hosts[0];\n  let ts = Number(p.timestamp || p.lastchange || p.clock || 0); if (ts > 1e12) ts = ts / 1000;\n  // hm = o HOST está em manutenção; mt = este problema não conta (host em manutenção OU problema silenciado à mão)\n  const hm = p.maintenance === true || p.maintenance === 1 || p.maintenance === \"1\" || !!(hs && (hs.maintenance_status == 1 || hs.maintenance === true));\n  const mt = hm || p.suppressed == 1 || p.suppressed === \"1\";\n  return { h: (hs && (hs.name || hs.host)) || p.host || \"?\", p: p.name || p.description || \"\", sev: Number(p.severity != null ? p.severity : p.priority) || 0, ts, mt, hm };\n});\nconst MAINT = new Set(P.filter(p => p.hm).map(p => p.h));     // hosts em manutenção (vistos pelos problemas)\nconst PA = P.filter(p => !p.mt);                               // problemas que contam\n// um problema silenciado (ou uma manutenção só de um alerta) não pinta o card inteiro de cinza: o card segue o estado real\n// do host; o cinza fica só para host em manutenção que está fora do ar (queda esperada)\nconst silenc = n => P.filter(p => p.h === n && p.mt).length;\n\nconst S = Object.values(H).sort((a, b) => a.n.localeCompare(b.n));\nS.forEach(s => { if (s.fw && !s.os) s.os = \"pfSense\"; const d = Object.values(s.disks).filter(x => x != null); s.disk = d.length ? Math.max(...d) : null; });\n\n/* --- sem dados: modo diagnóstico --- */\nif (!S.length) {\n  root.innerHTML = `<div class=\"dbg\">NOC: nenhum servidor reconhecido nas queries.\\nTire um print desta caixa e envie.\\n\\n${esc(debug.join(\"\\n\") || \"Nenhum dado recebido (confira as queries e o datasource).\")}\\n\\n${esc(ctxInfo)}</div>`;\n  return;\n}\n\n/* --- regras de estado --- */\nconst SEV = [\"Not classified\", \"Information\", \"Warning\", \"Average\", \"High\", \"Disaster\"];\nconst SEVC = [\"#6b7280\", \"#38bdf8\", \"#f5b301\", \"#fb923c\", \"#ef4444\", \"#b91c1c\"];\nconst online = s => s.st === 1;          // 1 = disponível, 0 = indisponível, 2 = desconhecido\nfunction state(s) {\n  if (MAINT.has(s.n) && s.st === 0) return \"maint\";\n  if (s.st === 0) return \"down\";          // fora do ar (agente/ping sem resposta): fundo vermelho\n  const m = PA.filter(x => x.h === s.n).map(x => x.sev);\n  if (!m.length) return (s.st === 2 || s.st == null) ? \"warn\" : \"ok\";\n  return Math.max(...m) >= 4 ? \"crit\" : \"warn\";\n}\nconst lvl = v => v == null ? \"\" : v >= LIMITE_CRITICO ? \"c\" : v >= LIMITE_ATENCAO ? \"w\" : \"\";\nconst pct = v => v == null ? \"—\" : (v < 1 ? v.toFixed(1) : v.toFixed(0)) + \"%\";\nconst dur = sec => { if (sec == null) return \"—\"; sec = Math.floor(sec); const d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60); return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m`; };\nconst age = ts => ts ? dur(Date.now() / 1000 - ts) : \"\";\nconst bar = (n, v, off, t) => `<div class=\"m\"><span class=\"n\" title=\"${esc(t || n)}\">${esc(n)}</span><div class=\"track\"><div class=\"fill ${lvl(v)}\" style=\"width:${off ? 0 : (v || 0)}%\"></div></div><span class=\"val\">${off ? \"—\" : pct(v)}</span></div>`;\nconst stLabel = s => MAINT.has(s.n) && s.st === 0 ? \"● manutenção\" : s.st === 1 ? \"● online\" : s.st === 0 ? \"● offline\" : \"● desconhecido\";\n\n// um bar por disco, do mais cheio para o mais vazio (rótulo curto: \"C:\", \"/var\"...)\nconst shortDisk = k => (k.match(/^([A-Z]:)/) || [k])[0].slice(0, 7);\nfunction diskBars(s, off) {\n  const d = Object.entries(s.disks).sort((a, b) => (b[1] || 0) - (a[1] || 0));\n  if (!d.length) return bar(\"DISCO\", null, true);\n  const mais = d.length - MAX_DISCOS;\n  return `<div class=\"disks\">${d.slice(0, MAX_DISCOS).map(([k, v]) => bar(shortDisk(k), v, off, \"Disco \" + k)).join(\"\")}${mais > 0 ? `<div class=\"dmore\">+${mais} disco${mais > 1 ? \"s\" : \"\"} (ver detalhe)</div>` : \"\"}</div>`;\n}\n\nconst num = n => n == null ? \"—\" : Math.round(n).toLocaleString(\"pt-BR\");\nconst kbps = b => b == null ? \"—\" : b >= 1e9 ? (b / 1e9).toFixed(1) + \"G\" : b >= 1e6 ? (b / 1e6).toFixed(1) + \"M\" : b >= 1e3 ? (b / 1e3).toFixed(0) + \"K\" : Math.round(b) + \"\";\n// links de internet do roteador: estado pelo teste da RB; tráfego pela interface cujo nome/descrição cita o link (ex.: \"ether1(WAN-BETA ...)\")\nfunction wanRows(s, off) {\n  if (!s.wan) return \"\";\n  return `<div class=\"wanb\">${Object.keys(s.wan).sort().map(k => { const v = s.wan[k];\n    const ik = Object.keys(s.ifs).find(n => n.toUpperCase().includes(k)), I = ik ? s.ifs[ik] : null;\n    const tr = I && (I.rx != null || I.tx != null) ? ` <span class=\"tr\">↓${kbps(I.rx)} ↑${kbps(I.tx)}</span>` : \"\";\n    return `<div class=\"fwl wan\" title=\"${esc(k)}: internet testada pela própria RB${ik ? \" · interface \" + esc(ik) : \"\"}\"><span><i class=\"wd ${off || v == null ? \"\" : v === 1 ? \"up\" : \"dn\"}\"></i>${esc(k)}</span><b class=\"${off || v == null ? \"\" : v === 1 ? \"okc\" : \"bad\"}\">${off || v == null ? \"—\" : v === 1 ? \"ok\" + tr : \"SEM INTERNET\"}</b></div>`; }).join(\"\")}</div>`;\n}\nfunction statesPct(s) { const x = s.x; return x.statesPct != null ? x.statesPct : (x.states != null && x.statesMax ? x.states / x.statesMax * 100 : null); }\nfunction fwBars(s, off) {\n  const x = s.x;\n  return `${s.cpu != null ? bar(\"CPU\", s.cpu, off) : \"\"}${s.mem != null ? bar(\"MEM\", s.mem, off) : \"\"}\n    ${bar(\"CONEX.\", statesPct(s), off, \"Uso da tabela de estados (conexões ativas)\")}\n    <div class=\"fwl\"><span>Conexões</span><b>${off ? \"—\" : num(x.states)}</b></div>\n    <div class=\"fwl\"><span>Tráfego ↓</span><b>${off ? \"—\" : bps(s.rx)}</b></div>\n    <div class=\"fwl\"><span>Tráfego ↑</span><b>${off ? \"—\" : bps(s.tx)}</b></div>\n    <div class=\"fwl\"><span>Filtro PF</span><b class=\"${x.pf === 1 ? \"okc\" : x.pf == null ? \"\" : \"bad\"}\">${x.pf === 1 ? \"rodando\" : x.pf == null ? \"—\" : \"PARADO\"}</b></div>`;\n}\n\nconst bytes = b => { if (b == null) return \"—\"; const u = [\"B\", \"KB\", \"MB\", \"GB\", \"TB\"]; let i = 0; while (b >= 1024 && i < 4) { b /= 1024; i++; } return b.toFixed(i >= 3 ? 1 : 0) + \" \" + u[i]; };\nconst bps = b => { if (b == null) return \"—\"; const u = [\"bps\", \"Kbps\", \"Mbps\", \"Gbps\"]; let i = 0; while (b >= 1000 && i < 3) { b /= 1000; i++; } return b.toFixed(i ? 1 : 0) + \" \" + u[i]; };\n/* --- KPIs --- */\nconst SM = S.filter(s => !(MAINT.has(s.n) && s.st === 0)), nMaint = S.length - SM.length;\nconst live = SM.filter(online), N = SM.length;\nconst avg = k => { const a = live.map(s => s[k]).filter(x => x != null); return a.length ? (a.reduce((x, y) => x + y, 0) / a.length).toFixed(0) : \"—\"; };\nconst memHi = live.filter(s => s.mem != null && s.mem >= 85).length;\nconst d85 = S.reduce((n, s) => n + Object.values(s.disks).filter(x => x != null && x >= 85).length, 0);\nconst hi = PA.filter(p => p.sev >= 4).length, alert = SM.filter(s => state(s) !== \"ok\").length;\n\n/* --- cards --- */\nconst ord = { down: 0, crit: 1, warn: 2, ok: 3, maint: 4 };\nconst cardsHtml = [...S].sort((a, b) => ord[state(a)] - ord[state(b)] || a.n.localeCompare(b.n)).map(s => {\n  const st = state(s), off = !online(s), top = PA.filter(p => p.h === s.n).sort((a, b) => b.sev - a.sev)[0];\n  const issue = st === \"maint\" ? \"EM MANUTENÇÃO\" : s.st === 0 ? \"OFFLINE · agente sem resposta\" : top ? top.p : \"\";\n  return `<div class=\"card ${st} ${off ? \"off\" : \"\"}\" data-n=\"${esc(s.n)}\">\n    <div class=\"ch\"><span class=\"dot\"></span>${esc(s.n)}</div>\n    <div class=\"sub\">${esc(s.os || \"—\")} · uptime ${off ? \"—\" : dur(s.up)}${MAINT.has(s.n) && st !== \"maint\" ? ' · <span class=\"mtag\">manutenção</span>' : \"\"}</div>\n    ${issue ? `<div class=\"issue\" title=\"${esc(issue)}\">${esc(issue)}</div>` : \"\"}\n    ${s.fw ? fwBars(s, off) : `${bar(\"CPU\", s.cpu, off)}${bar(\"MEM\", s.mem, off)}${diskBars(s, off)}`}${wanRows(s, off)}\n    <div class=\"foot\"><span>${stLabel(s)}</span><span>${PA.filter(p => p.h === s.n).length} problema(s)${silenc(s.n) ? ` · <span class=\"mtag\">${silenc(s.n)} silenciado(s)</span>` : \"\"}</span></div></div>`;\n}).join(\"\");\n\nconst Q = [...P].sort((a, b) => (a.mt - b.mt) || b.sev - a.sev || b.ts - a.ts);\nconst queueHtml = Q.length ? Q.map(p => `<li data-n=\"${esc(p.h)}\" class=\"${p.mt ? \"mt\" : \"\"}\"><span class=\"bar\" style=\"background:${p.mt ? \"#6b7280\" : SEVC[p.sev] || SEVC[0]}\"></span>\n  <div><div class=\"h\">${esc(p.h)}${p.mt ? ` <span class=\"mtag\">${p.hm ? \"manutenção\" : \"silenciado\"}</span>` : \"\"}</div><div class=\"p\"><span class=\"sev\" style=\"color:${SEVC[p.sev] || SEVC[0]}\">${SEV[p.sev] || \"\"}</span>${esc(p.p)}</div></div><span class=\"t\">${age(p.ts)}</span></li>`).join(\"\")\n  : `<li class=\"empty\">Nenhum problema ativo.</li>`;\n\n/* --- sites e certificados --- */\nconst nowS = Date.now() / 1000;\nconst diasCert = x => x.exp != null ? (x.exp - nowS) / 86400 : null;\nconst siteState = x => { const d = diasCert(x);\n  return (x.fail != null && x.fail > 0) || (d != null && d < 0) ? \"crit\" : d != null && d < CERT_ALERTA_DIAS ? \"cert\" : x.fail == null ? \"unk\" : \"ok\"; };\nconst ORD_SITE = { crit: 0, cert: 1, warn: 2, unk: 3, ok: 4 };\nconst SL = Object.values(SITES).sort((a, b) => (ORD_SITE[siteState(a)] - ORD_SITE[siteState(b)]) || a.n.localeCompare(b.n));\nconst sitesUp = SL.filter(x => x.fail === 0).length, certSoon = SL.filter(x => diasCert(x) != null && diasCert(x) >= 0 && diasCert(x) < CERT_ALERTA_DIAS).length, certVenc = SL.filter(x => diasCert(x) != null && diasCert(x) < 0).length;\nconst sitesHtml = SL.length ? `<section class=\"sites\"><div class=\"sh\"><b>Sites</b><span>${sitesUp}/${SL.length} no ar${certVenc ? ` · <em class=\"bad\">${certVenc} certificado(s) VENCIDO(S)</em>` : \"\"}${certSoon ? ` · <em>${certSoon} certificado(s) vencendo em &lt; ${CERT_ALERTA_DIAS} dias</em>` : \"\"}</span></div>\n  <div class=\"chips\">${SL.map(x => { const st = siteState(x), d = x.exp != null ? Math.floor((x.exp - nowS) / 86400) : null;\n    return `<div class=\"chip ${st}\" title=\"${esc(x.n)}${x.fail > 0 ? \" · FALHOU no step \" + x.fail : \"\"}\"><span class=\"dot\"></span><span class=\"sn\">${esc(x.n)}</span>\n      <span class=\"sm\">${x.fail > 0 ? \"FORA\" : x.rt != null ? Math.round(x.rt * 1000) + \" ms\" : \"—\"}</span><span class=\"sm ${d != null && d < 0 ? \"venc\" : d != null && d < CERT_ALERTA_DIAS ? \"hot\" : \"\"}\" title=\"${d != null ? (d < 0 ? \"certificado vencido há \" + -d + \" dia(s)\" : \"certificado vence em \" + d + \" dia(s)\") : \"\"}\">${d != null ? (d < 0 ? \"🔒 VENCIDO\" : \"🔒 \" + d + \"d\") : \"\"}</span></div>`; }).join(\"\")}</div></section>` : \"\";\n\nconst K = [\n  [\"Servidores online\", `${live.length}<span> / ${N}</span>`, live.length < N ? \"crit\" : \"ok\", `${N - live.length} fora do ar${nMaint ? ` · ${nMaint} em manutenção` : \"\"}`],\n  [\"Em alerta\", alert, alert ? \"warn\" : \"ok\", \"com problema ativo\"],\n  [\"Sites no ar\", SL.length ? `${sitesUp}<span> / ${SL.length}</span>` : \"—\", !SL.length ? \"\" : sitesUp < SL.length || certVenc ? \"crit\" : certSoon ? \"warn\" : \"ok\", certVenc ? `${certVenc} certificado(s) vencido(s)` : certSoon ? `${certSoon} certificado(s) vencendo` : `CPU média ${avg(\"cpu\")}%`],\n  [\"Memória média\", `${avg(\"mem\")}<span>%</span>`, memHi ? \"warn\" : \"\", `${memHi} acima de 85%`],\n  [\"Discos ≥ 85%\", d85, d85 ? \"warn\" : \"ok\", \"filesystems\"],\n  [\"Problemas ativos\", PA.length, hi ? \"crit\" : PA.length ? \"warn\" : \"ok\", `${hi} High/Disaster`]\n];\n\n/* --- tela congelada? --- */\nconst fmtH = ms => new Date(ms).toLocaleTimeString(\"pt-BR\");\nconst atrasoMin = newest ? (Date.now() - newest) / 60000 : null;\nconst staleHtml = atrasoMin != null && atrasoMin > ATRASO_MAX_MIN\n  ? `<div class=\"stale\">⚠ DADOS ATRASADOS — a última coleta recebida é de ${fmtH(newest)} (há ${Math.round(atrasoMin)} min). O que está na tela pode não refletir a situação atual. Verifique o Zabbix server e o datasource do Grafana.</div>` : \"\";\nconst topHtml = `<div class=\"topbar\"><span class=\"${staleHtml ? \"bad\" : \"\"}\">● ${newest ? \"dados de \" + fmtH(newest) : \"sem timestamp\"}</span>${typeof DRILL_UID !== \"undefined\" && DRILL_UID ? \"<span>duplo clique no card abre o detalhe do servidor</span>\" : \"\"}<span>tela renderizada às ${fmtH(Date.now())}</span></div>`;\n\nroot.innerHTML = `${staleHtml}${topHtml}\n  <section class=\"kpis\">${K.map(k => `<div class=\"kpi ${k[2]}\"><div class=\"l\">${k[0]}</div><div class=\"v\">${k[1]}</div><div class=\"s\">${k[3]}</div></div>`).join(\"\")}</section>\n  ${sitesHtml}\n  <div class=\"main\">\n    <section class=\"grid\">${cardsHtml}</section>\n    <aside class=\"side\">\n      <div class=\"box\"><h2>Atenção <span class=\"c ${PA.length ? \"\" : \"z\"}\" title=\"${P.length - PA.length ? (P.length - PA.length) + \" silenciado(s) / em manutenção, em cinza na lista\" : \"\"}\">${PA.length}</span></h2><ul class=\"q\">${queueHtml}</ul></div>\n      <div class=\"box\"><h2>Em destaque <span class=\"sp\" style=\"color:var(--mute);font-weight:400\"></span></h2><div class=\"spot\"></div></div>\n    </aside>\n  </div>`;\n\n/* --- destaque com rotação --- */\nconst W = window.__nocState = window.__nocState || {};\nclearInterval(W.timer);\nconst spotEl = root.querySelector(\".spot\"), spLbl = root.querySelector(\".sp\");\nfunction spot(name) {\n  const s = S.find(x => x.n === name); if (!s) return;\n  const st = state(s), off = !online(s), col = { down: \"#ef4444\", crit: \"#fb923c\", warn: \"#f5b301\", ok: \"#22c55e\", maint: \"#6b7280\" }[st];\n  const pr = P.filter(p => p.h === name);\n  root.querySelectorAll(\".card\").forEach(c => c.classList.toggle(\"focus\", c.dataset.n === name));\n  spotEl.innerHTML = `<div class=\"title\"><b>${esc(s.n)}</b><span class=\"badge\" style=\"background:${col}\">${st === \"maint\" ? \"MANUTENÇÃO\" : st === \"ok\" ? \"OK\" : s.st === 0 ? \"OFFLINE\" : \"ALERTA\"}</span></div>\n    <div class=\"sub\">${esc(s.os || \"—\")} · uptime ${off ? \"—\" : dur(s.up)}</div>\n    ${bar(\"CPU\", s.cpu, off)}${bar(\"MEM\", s.mem, off)}${wanRows(s, off)}\n    <table>${Object.entries(s.disks).sort((a, b) => (b[1] || 0) - (a[1] || 0)).slice(0, 4).map(([k, v]) => `<tr><td>Disco ${esc(k)}</td><td>${pct(v)}</td></tr>`).join(\"\") || \"<tr><td>Discos</td><td>sem dados</td></tr>\"}\n    ${pr.map(p => `<tr><td style=\"color:${p.mt ? \"#6b7280\" : SEVC[p.sev] || SEVC[0]}\">${esc(p.p)}${p.mt ? (p.hm ? \" (manutenção)\" : \" (silenciado)\") : \"\"}</td><td>${age(p.ts)}</td></tr>`).join(\"\")}</table>`;\n}\nlet rot = [...new Set(Q.filter(p => !p.mt).map(p => p.h))].filter(n => S.some(s => s.n === n));\nS.filter(s => s.st === 0 && !MAINT.has(s.n) && !rot.includes(s.n)).forEach(s => rot.unshift(s.n));\nif (!rot.length) rot = S.map(s => s.n);\nW.i = (W.i || 0) % rot.length;\nconst show = () => { const n = W.pinned && S.some(s => s.n === W.pinned) ? W.pinned : rot[W.i % rot.length]; spot(n); spLbl.textContent = W.pinned ? \"fixado · clique de novo para soltar\" : `rotação · ${W.i % rot.length + 1}/${rot.length}`; };\nshow();\nW.timer = setInterval(() => { if (!document.body.contains(root)) return clearInterval(W.timer); if (!W.pinned) { W.i++; show(); } }, ROTACAO_MS);\n\n/* --- card de detalhe (hover) --- */\nfunction spark(arr, color) {\n  if (!arr || arr.length < 2) return `<div class=\"nk-spark nk-empty\">sem histórico</div>`;\n  const w = 150, h = 28, mx = 100, step = w / (arr.length - 1);\n  const pts = arr.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / mx) * h).toFixed(1)}`).join(\" \");\n  return `<svg class=\"nk-spark\" viewBox=\"0 0 ${w} ${h}\" preserveAspectRatio=\"none\"><polyline points=\"0,${h} ${pts} ${w},${h}\" fill=\"${color}\" fill-opacity=\".15\" stroke=\"none\"/><polyline points=\"${pts}\" fill=\"none\" stroke=\"${color}\" stroke-width=\"1.5\"/></svg>`;\n}\nconst row = (k, v) => `<div class=\"nk-row\"><span>${k}</span><span>${v}</span></div>`;\nfunction detail(s) {\n  const st = state(s), off = !online(s), x = s.x;\n  const col = { down: \"#ef4444\", crit: \"#fb923c\", warn: \"#f5b301\", ok: \"#22c55e\", maint: \"#6b7280\" }[st];\n  const used = x.memUsed != null ? x.memUsed : (x.memTotal != null && x.memAvail != null ? x.memTotal - x.memAvail : null);\n  const pr = P.filter(p => p.h === s.n).sort((a, b) => b.sev - a.sev);\n  const disks = Object.entries(s.disks).sort((a, b) => (b[1] || 0) - (a[1] || 0));\n  return `<div class=\"nk-head\" style=\"border-color:${col}\"><div><b>${esc(s.n)}</b><div class=\"nk-sub\">${esc(s.os || \"—\")} · ${stLabel(s).replace(\"● \", \"agente \")}</div></div>\n      <span class=\"badge\" style=\"background:${col}\">${st === \"maint\" ? \"MANUTENÇÃO\" : st === \"ok\" ? \"OK\" : s.st === 0 ? \"OFFLINE\" : \"ALERTA\"}</span></div>\n    ${s.fw && s.cpu == null && s.mem == null ? `<div class=\"nk-sec\"><div class=\"nk-t\">Recursos</div><div class=\"nk-empty\">CPU e memória não coletados (o template pfSense não traz; ver documentação do painel)</div></div>` : \"\"}\n    <div class=\"nk-sec\" style=\"${s.fw && s.cpu == null && s.mem == null ? \"display:none\" : \"\"}\"><div class=\"nk-t\">Recursos · última hora</div>\n      <div class=\"nk-res\"><div><span>CPU</span><b class=\"${lvl(s.cpu)}\">${off ? \"—\" : pct(s.cpu)}</b></div>${spark(off ? [] : s.cpuH, \"#38bdf8\")}</div>\n      <div class=\"nk-res\"><div><span>Memória</span><b class=\"${lvl(s.mem)}\">${off ? \"—\" : pct(s.mem)}</b></div>${spark(off ? [] : s.memH, \"#a78bfa\")}</div>\n      ${s.fw && used == null && x.memTotal == null ? \"\" : row(\"Memória usada\", used != null || x.memTotal != null ? `${bytes(used)} / ${bytes(x.memTotal)}` : \"—\")}\n      ${x.swapFree != null ? row(\"Swap livre\", pct(x.swapFree)) : \"\"}\n    </div>\n    <div class=\"nk-sec\"><div class=\"nk-t\">Sistema</div>\n      ${row(\"Uptime\", off ? \"—\" : dur(s.up))}\n      ${s.fw && x.cores == null ? \"\" : row(\"Núcleos de CPU\", x.cores != null ? x.cores : \"—\")}\n      ${x.queue != null ? row(\"Fila de CPU\", x.queue.toFixed(1)) : \"\"}${x.load != null ? row(\"Load (1m)\", x.load.toFixed(2)) : \"\"}\n      ${s.fw && x.procs == null ? \"\" : row(\"Processos\", x.procs != null ? x.procs : \"—\")}\n      ${row(\"Rede ↓ / ↑\", off ? \"—\" : `${bps(s.rx)} / ${bps(s.tx)}`)}\n    </div>\n    ${s.fw ? `<div class=\"nk-sec\"><div class=\"nk-t\">Firewall</div>\n      ${row(\"Conexões (estados)\", `${num(x.states)} / ${num(x.statesMax)}`)}\n      ${row(\"Uso da tabela de estados\", pct(statesPct(s)))}\n      ${x.srcTrack != null ? row(\"Source tracking\", num(x.srcTrack)) : \"\"}\n      ${row(\"Regras de firewall\", num(x.rules))}\n      ${row(\"Filtro PF\", x.pf === 1 ? \"rodando\" : x.pf == null ? \"—\" : \"PARADO\")}\n    </div>\n    <div class=\"nk-sec\"><div class=\"nk-t\">Interfaces</div>\n      ${Object.keys(s.ifs).length ? Object.entries(s.ifs).filter(([n]) => !/^(lo|pflog|pfsync|enc)\\d/i.test(n)).sort((a, b) => ((b[1].rx || 0) + (b[1].tx || 0)) - ((a[1].rx || 0) + (a[1].tx || 0))).map(([n, I]) =>\n        `<div class=\"nk-if\"><span class=\"d ${I.st === 1 ? \"up\" : I.st == null ? \"\" : \"dn\"}\"></span><span title=\"${esc(n)}\">${esc(n)}</span><span>↓ ${bps(I.rx)}</span><span>↑ ${bps(I.tx)}</span></div>`).join(\"\") : `<div class=\"nk-empty\">sem dados</div>`}\n    </div>` : \"\"}\n    ${s.fw && !Object.keys(s.disks).length ? \"\" : `<div class=\"nk-sec\"><div class=\"nk-t\">Discos</div>\n      ${disks.length ? disks.map(([k, v]) => `<div class=\"nk-disk\"><span title=\"${esc(k)}\">${esc(k)}</span><div class=\"track\"><div class=\"fill ${lvl(v)}\" style=\"width:${v || 0}%\"></div></div><span>${pct(v)}</span></div>`).join(\"\") : `<div class=\"nk-empty\">sem dados</div>`}\n    </div>`}\n    <div class=\"nk-sec\"><div class=\"nk-t\">Problemas ativos (${pr.length})</div>\n      ${pr.length ? pr.map(p => `<div class=\"nk-pr\"><span class=\"sev\" style=\"color:${SEVC[p.sev] || SEVC[0]}\">${SEV[p.sev] || \"\"}</span>${esc(p.p)}<span class=\"nk-age\">${age(p.ts)}</span></div>`).join(\"\") : `<div class=\"nk-empty\">Nenhum</div>`}\n    </div>`;\n}\nconst stale = document.querySelector(\"body > .noc-tip\"); if (stale) stale.remove();   // versão antiga\nroot.style.position = \"relative\";\nlet tip = root.querySelector(\".nk-card\");\nif (!tip) { tip = document.createElement(\"div\"); tip.className = \"nk-card\"; root.appendChild(tip); }\nlet tipFor = null;\nroot.onmousemove = e => {\n  const c = e.target.closest(\".card\");\n  if (!c) { tip.style.display = \"none\"; tipFor = null; return; }\n  const s = S.find(x => x.n === c.dataset.n); if (!s) return;\n  if (tipFor !== s.n) { tip.innerHTML = detail(s); tipFor = s.n; }\n  tip.style.display = \"block\";\n  const r = root.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;\n  let vx = e.clientX + 18, vy = e.clientY + 12;                 // coordenadas na janela\n  if (vx + tw > innerWidth - 8) vx = e.clientX - tw - 18;\n  if (vx < 8) vx = 8;\n  if (vy + th > innerHeight - 8) vy = innerHeight - 8 - th;\n  if (vy < 8) vy = 8;\n  tip.style.left = (vx - r.left + root.scrollLeft) + \"px\";\n  tip.style.top = (vy - r.top + root.scrollTop) + \"px\";\n};\nroot.onmouseleave = () => { tip.style.display = \"none\"; tipFor = null; };\n// duplo clique num card abre o dashboard de detalhe do servidor (só se DRILL_UID estiver definido no topo do código)\nroot.ondblclick = e => {\n  const c = e.target.closest(\".card, .q li[data-n]\"); if (!c || typeof DRILL_UID === \"undefined\" || !DRILL_UID) return;\n  const base = location.pathname.replace(/\\/d\\/.*$/, \"\");\n  window.top.location.href = `${base}/d/${DRILL_UID}?var-host=${encodeURIComponent(c.dataset.n)}`;\n};\nroot.onclick = e => {\n  const t = e.target.closest(\".q li[data-n], .card\"); if (!t) return;\n  W.pinned = W.pinned === t.dataset.n ? null : t.dataset.n;\n  if (!W.pinned) { const k = rot.indexOf(t.dataset.n); if (k >= 0) W.i = k; }\n  show();\n};\n",
+        "styles": ".noc{--line:#223049;--ink:#e6edf7;--ink2:#9fb0c8;--mute:#64748b;--ok:#22c55e;--warn:#f5b301;--crit:#ef4444;--accent:#38bdf8;--bar:#3b82f6;color:var(--ink);font:13px/1.35 \"Segoe UI\",Roboto,Arial,sans-serif;min-height:100%;overflow:visible;position:relative}\n.noc *{box-sizing:border-box}\n.noc .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}\n.noc .kpi{background:#111827;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:6px;padding:8px 10px}\n.noc .kpi .l{font-size:10px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px}\n.noc .kpi .v{font:700 24px/1.1 Consolas,monospace;margin-top:2px}\n.noc .kpi .v span{font-size:13px;color:var(--ink2);font-weight:400}\n.noc .kpi .s{font-size:10px;color:var(--mute)}\n.noc .kpi.ok{border-left-color:var(--ok)}.noc .kpi.warn{border-left-color:var(--warn)}.noc .kpi.crit{border-left-color:var(--crit)}\n.noc .main{display:grid;grid-template-columns:1fr 340px;gap:12px}\n.noc .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;align-content:start}\n.noc .card{background:#141c2b;border:1px solid var(--line);border-top:3px solid var(--ok);border-radius:6px;padding:8px 10px;cursor:pointer}\n.noc .card:hover{border-color:var(--accent)}\n.noc .card.warn{border-top-color:var(--warn)}.noc .card.crit{border-top-color:#fb923c}.noc .card.crit .dot{background:#fb923c}.noc .card.crit .issue{background:rgba(251,146,60,.16);color:#fdba74}\n.noc .card.down{border-top-color:var(--crit);background:#1d1418}.noc .card.down .dot{background:var(--crit)}.noc .card.down .issue{background:rgba(239,68,68,.18);color:#fca5a5}\n.noc .card.focus{outline:2px solid var(--accent)}\n.noc .ch{display:flex;align-items:center;gap:6px;font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.noc .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--ok)}\n.noc .warn .dot{background:var(--warn)}.noc .crit .dot{background:var(--crit)}\n.noc .sub{font-size:10px;color:var(--mute);margin:1px 0 6px}\n.noc .issue{font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px;margin-bottom:6px;display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.noc .warn .issue{background:rgba(245,179,1,.15);color:#fcd34d}.noc .crit .issue{background:rgba(239,68,68,.18);color:#fca5a5}\n.noc .m{display:grid;grid-template-columns:44px 1fr 42px;align-items:center;gap:6px;font-size:11px;margin:3px 0}\n.noc .m .n{color:var(--ink2)}.noc .m .val{text-align:right;font-family:Consolas,monospace}\n.noc .track{height:6px;background:#1f2a3d;border-radius:3px;overflow:hidden}\n.noc .fill{height:100%;border-radius:3px;background:var(--bar)}\n.noc .fill.w{background:var(--warn)}.noc .fill.c{background:var(--crit)}\n.noc .foot{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-top:6px;border-top:1px solid var(--line);padding-top:5px}\n.noc .off .val,.noc .off .track{opacity:.35}\n.noc .side{display:flex;flex-direction:column;gap:12px}\n.noc .box{background:#111827;border:1px solid var(--line);border-radius:6px}\n.noc .box h2{margin:0;padding:8px 10px;font-size:12px;display:flex;justify-content:space-between;border-bottom:1px solid var(--line)}\n.noc .box h2 .c{background:var(--crit);color:#fff;border-radius:10px;padding:0 7px;font-size:11px}\n.noc .box h2 .c.z{background:var(--ok)}\n.noc .q{list-style:none;margin:0;padding:0;max-height:320px;overflow:auto}\n.noc .q li{display:grid;grid-template-columns:4px 1fr auto;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);cursor:pointer}\n.noc .q li:hover{background:#18233a}\n.noc .q .bar{border-radius:2px}.noc .q .h{font-weight:600;font-size:12px}.noc .q .p{font-size:11px;color:var(--ink2)}\n.noc .q .t{font-size:10px;color:var(--mute);white-space:nowrap}\n.noc .q .empty{display:block;padding:10px;color:var(--mute)}\n.noc .sev{font-size:9px;font-weight:700;text-transform:uppercase;margin-right:4px}\n.noc .spot{padding:10px}\n.noc .spot .title{display:flex;justify-content:space-between;align-items:center}\n.noc .spot .title b{font-size:16px}\n.noc .badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;color:#000}\n.noc .spot table{width:100%;border-collapse:collapse;margin-top:8px;font-size:11px}\n.noc .spot td{padding:3px 0;border-bottom:1px solid var(--line)}.noc .spot td:last-child{text-align:right;font-family:Consolas,monospace}\n.noc .dbg{font:11px Consolas,monospace;color:#fcd34d;white-space:pre-wrap;background:#111827;padding:10px;border:1px solid var(--line);border-radius:6px}\n@media (max-width:1100px){.noc .main{grid-template-columns:1fr}.noc .kpis{grid-template-columns:repeat(3,1fr)}}\n.noc .spot table,.noc .spot tr,.noc .spot td{border:0!important;background:transparent!important}\n.noc .spot td{border-bottom:1px solid var(--line)!important;padding:3px 0!important}\n\n.noc .nk-card{position:absolute;z-index:50;display:none;width:360px;pointer-events:none;background:#0f172a;border:1px solid #2b3b57;border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.6);font-size:11px;overflow:hidden}\n.noc .nk-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:10px 12px;border-left:4px solid;background:#111b2e}\n.noc .nk-head b{font-size:14px}.noc .nk-sub{color:var(--mute);font-size:10px;margin-top:2px}\n.noc .nk-sec{padding:8px 12px;border-top:1px solid var(--line)}\n.noc .nk-t{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink2);margin-bottom:5px}\n.noc .nk-row{display:flex;justify-content:space-between;padding:2px 0}.noc .nk-row span:last-child{font-family:Consolas,monospace}\n.noc .nk-res{display:grid;grid-template-columns:90px 1fr;align-items:center;gap:8px;margin-bottom:4px}\n.noc .nk-res span{display:block;color:var(--ink2);font-size:10px}.noc .nk-res b{font:700 16px Consolas,monospace}\n.noc .nk-res b.w{color:var(--warn)}.noc .nk-res b.c{color:var(--crit)}\n.noc .nk-spark{width:100%;height:28px;display:block}\n.noc .nk-empty{color:var(--mute);font-size:10px}\n.noc .nk-disk{display:grid;grid-template-columns:120px 1fr 40px;align-items:center;gap:6px;margin:3px 0}\n.noc .nk-disk span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.noc .nk-disk span:last-child{text-align:right;font-family:Consolas,monospace}\n.noc .nk-pr{padding:2px 0;display:flex;gap:4px;align-items:baseline}.noc .nk-age{margin-left:auto;color:var(--mute);white-space:nowrap}\n\n.noc .disks .m{margin:2px 0;font-size:10px}.noc .disks .track{height:5px}\n.noc .m .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.noc .nk-card{max-height:calc(100vh - 16px);overflow-y:auto}\n\n.noc .fwl{display:flex;justify-content:space-between;font-size:11px;margin:3px 0}.noc .fwl span{color:var(--ink2)}.noc .fwl b{font:600 11px Consolas,monospace}\n.noc .fwl b.okc{color:var(--ok)}.noc .fwl b.bad{color:var(--crit)}\n.noc .nk-if{display:grid;grid-template-columns:10px 1fr 80px 80px;gap:6px;align-items:center;margin:2px 0}\n.noc .nk-if span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.noc .nk-if span:nth-child(n+3){text-align:right;font-family:Consolas,monospace}\n.noc .nk-if .d{width:7px;height:7px;border-radius:50%;background:var(--mute)}.noc .nk-if .d.up{background:var(--ok)}.noc .nk-if .d.dn{background:var(--crit)}\n\n.noc .stale{background:#7f1d1d;border:1px solid var(--crit);color:#fff;font-weight:700;padding:10px 14px;border-radius:6px;margin-bottom:8px;animation:nocblink 1.6s infinite}\n@keyframes nocblink{50%{opacity:.75}}\n.noc .topbar{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin-bottom:6px}.noc .topbar .bad{color:var(--crit);font-weight:700}\n.noc .sites{background:#111827;border:1px solid var(--line);border-radius:6px;padding:8px 10px;margin-bottom:12px}\n.noc .sites .sh{display:flex;gap:10px;align-items:baseline;font-size:12px;margin-bottom:6px}.noc .sites .sh span{color:var(--ink2);font-size:11px}.noc .sites .sh em{color:var(--warn);font-style:normal}\n.noc .chips{display:flex;flex-wrap:wrap;gap:6px}\n.noc .chip{display:flex;align-items:center;gap:6px;background:#141c2b;border:1px solid var(--line);border-left:3px solid var(--ok);border-radius:4px;padding:4px 8px;font-size:11px}\n.noc .chip.warn{border-left-color:var(--warn)}.noc .chip.crit{border-left-color:var(--crit);background:#1d1418}.noc .chip.unk{border-left-color:var(--mute)}\n.noc .chip .dot{width:7px;height:7px}.noc .chip.unk .dot{background:var(--mute)}\n.noc .chip .sn{font-weight:600}.noc .chip .sm{color:var(--ink2);font-family:Consolas,monospace;font-size:10px}.noc .chip .sm.hot{color:var(--warn);font-weight:700}\n.noc .card.maint{border-top-color:#6b7280;opacity:.6}.noc .card.maint .dot{background:#6b7280}\n.noc .card.maint .issue{background:rgba(107,114,128,.25);color:#cbd5e1}\n.noc .q li.mt{opacity:.55}.noc .mtag{font-size:9px;font-weight:600;background:#374151;color:#cbd5e1;border-radius:3px;padding:0 5px;margin-left:4px}\n\n.noc .dmore{font-size:10px;color:var(--mute);text-align:right;margin-top:1px}\n.noc .chip.cert{border-left-color:#fb923c}.noc .chip.cert .dot{background:#fb923c}.noc .chip .sm.hot{color:#fb923c}.noc .chip .sm.venc{color:var(--crit);font-weight:700}\n.noc .sites .sh em.bad{color:var(--crit);font-weight:700}\n.noc .wanb{margin-top:4px;border-top:1px dashed var(--line);padding-top:4px}.noc .fwl.wan span{display:inline-flex;align-items:center;gap:5px}\n.noc .fwl.wan .wd{width:7px;height:7px;border-radius:50%;background:var(--mute);display:inline-block}.noc .fwl.wan .wd.up{background:var(--ok)}.noc .fwl.wan .wd.dn{background:var(--crit)}\n.noc .fwl.wan .tr{color:var(--ink2);font-weight:400;font-size:10px}\n",
+        "helpers": "",
+        "editors": [
+          "afterRender",
+          "styles"
+        ],
+        "wrap": false,
+        "contentPartials": [],
+        "editor": {
+          "format": "auto",
+          "language": "html"
+        }
+      }
+    }
+  ]
+}

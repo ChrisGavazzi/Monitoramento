@@ -1,0 +1,1929 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+  - uuid: dd47fe0de349414d9edd934dd24bc4f8
+    name: Templates/NOC
+  templates:
+  - uuid: fd7ce5a9790c4feea38d5db39eb38259
+    template: NOC - Switch
+    name: NOC - Switch
+    description: Switches do site. Ping + SNMP genérico (portas, tráfego, erros).
+    groups:
+    - name: Templates/NOC
+    items:
+    - uuid: 18bae9606dac4c72b92ebfa76171afb3
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: 30s
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 3286a066773845798f0e9b19f7c61780
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: 30s
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 3dbe155b5e504d59b1a07d9ab6c65ca8
+      name: 'Gateway do site (via túnel): disponível'
+      type: SIMPLE
+      key: icmpping[{$SITE.GW},3]
+      delay: 30s
+      history: 7d
+      valuemap:
+        name: NOC ICMP
+      description: Ping ao gateway da rede deste equipamento no site ({$SITE.GW}). Se ele não responde, o problema é o túnel/roteador, e o alerta do equipamento fica suprimido.
+      tags:
+      - tag: component
+        value: network
+      - tag: component
+        value: sentinela
+    - uuid: e90dc138eeaa4e3cb5740e424ada11d5
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: 30s
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    macros:
+    - macro: '{$SITE.GW}'
+      value: ''
+      description: Gateway da rede do equipamento no site (sentinela do túnel).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) por 5 min para alertar.
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: switch
+    valuemaps:
+    - uuid: f9482bbba1c144dca0c8ccb75da4f3e9
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+    templates:
+    - name: Network Generic Device by SNMP
+  - uuid: 7e48f66dd4ae4db883ce9ba25ecf775a
+    template: NOC - AP Grandstream GWN
+    name: NOC - AP Grandstream GWN
+    description: 'Access points Wi-Fi Grandstream GWN (gerência pelo GDMS/GWN Manager). Ping + SNMP v2c: uptime real, CPU, memória, rádios e porta de cabo. Clientes por AP: o SNMP não entrega (ver no GDMS). Community: macro global {$SNMP_COMMUNITY}.'
+    groups:
+    - name: Templates/NOC
+    items:
+    - uuid: 0483958b2f254145acd68ac148485de4
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: 1m
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 47487368930e4ed0a195b102aba210d7
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: ab56691d7a9044f0a29f087ae193066a
+      name: 'Gateway do site (via túnel): disponível'
+      type: SIMPLE
+      key: icmpping[{$SITE.GW},3]
+      delay: 1m
+      history: 7d
+      valuemap:
+        name: NOC ICMP
+      description: Ping ao gateway da rede deste equipamento no site ({$SITE.GW}). Se ele não responde, o problema é o túnel/roteador, e o alerta do equipamento fica suprimido.
+      tags:
+      - tag: component
+        value: network
+      - tag: component
+        value: sentinela
+    - uuid: d31140f3148148ba82aab7a4f5d83058
+      name: SNMP agent availability
+      type: INTERNAL
+      key: zabbix[host,snmp,available]
+      history: 7d
+      valuemap:
+        name: zabbix.host.available
+      description: 0 = sem resposta, 1 = ok, 2 = desconhecido. O mapa usa este item (nome igual ao dos switches).
+      tags:
+      - tag: component
+        value: health
+      - tag: component
+        value: network
+    - uuid: e239232ab92a435490c1253be39d6ec5
+      name: Uptime do AP
+      type: SNMP_AGENT
+      snmp_oid: get[1.3.6.1.4.1.42397.1.1.2.6.0]
+      key: gwn.uptime
+      delay: 2m
+      history: 14d
+      units: uptime
+      trends: '0'
+      description: 'gwnDeviceUptime: tempo desde o último boot do AP. O sysUpTime NÃO serve: ele zera quando o serviço SNMP reinicia.'
+      preprocessing:
+      - type: MULTIPLIER
+        parameters:
+        - '0.01'
+      tags:
+      - tag: component
+        value: system
+    - uuid: d53de7ec5ab64681a32e9e9090b18a4d
+      name: Modelo
+      type: SNMP_AGENT
+      snmp_oid: get[1.3.6.1.4.1.42397.1.1.2.1.0]
+      key: gwn.model
+      delay: 1h
+      history: 30d
+      value_type: CHAR
+      trends: '0'
+      preprocessing:
+      - type: DISCARD_UNCHANGED_HEARTBEAT
+        parameters:
+        - 1d
+      tags:
+      - tag: component
+        value: system
+    - uuid: 046108fb23ac4f4bb5a7836ef0efb673
+      name: Firmware
+      type: SNMP_AGENT
+      snmp_oid: get[1.3.6.1.4.1.42397.1.1.2.4.0]
+      key: gwn.firmware
+      delay: 1h
+      history: 90d
+      value_type: CHAR
+      trends: '0'
+      description: O AP manda o texto em hexadecimal com um zero no fim; o JavaScript converte.
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - 'var s = value.trim();
+
+          if (/^([0-9A-Fa-f]{2}( |$))+$/.test(s)) { var o = ''''; s.split(/\s+/).forEach(function (h) { var c = parseInt(h, 16); if (c > 0) o += String.fromCharCode(c); }); return o; }
+
+          return value.replace(/\u0000/g, '''');'
+      - type: DISCARD_UNCHANGED_HEARTBEAT
+        parameters:
+        - 1d
+      tags:
+      - tag: component
+        value: system
+    - uuid: 42fab280099d471ebf2d1b3fd26b0791
+      name: 'CPU: uso'
+      type: SNMP_AGENT
+      snmp_oid: get[1.3.6.1.4.1.2021.11.11.0]
+      key: gwn.cpu.util
+      delay: 2m
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      description: 100 - ssCpuIdle (UCD-SNMP).
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - return 100 - Number(value);
+      tags:
+      - tag: component
+        value: cpu
+    - uuid: 23ef423a6faf42ef81a353f535cb81a1
+      name: 'Memória: total'
+      type: SNMP_AGENT
+      snmp_oid: get[1.3.6.1.4.1.2021.4.5.0]
+      key: gwn.mem.total
+      delay: 1h
+      history: 14d
+      units: B
+      preprocessing:
+      - type: MULTIPLIER
+        parameters:
+        - '1024'
+      tags:
+      - tag: component
+        value: memory
+    - uuid: a2fac60c19e6411e8064267af0218f42
+      name: 'Memória: livre'
+      type: SNMP_AGENT
+      snmp_oid: get[1.3.6.1.4.1.2021.4.6.0]
+      key: gwn.mem.free
+      delay: 2m
+      history: 14d
+      units: B
+      preprocessing:
+      - type: MULTIPLIER
+        parameters:
+        - '1024'
+      tags:
+      - tag: component
+        value: memory
+    - uuid: b892bc2c2eb94512a579430840f5f166
+      name: 'Memória: buffers'
+      type: SNMP_AGENT
+      snmp_oid: get[1.3.6.1.4.1.2021.4.14.0]
+      key: gwn.mem.buffer
+      delay: 2m
+      history: 14d
+      units: B
+      preprocessing:
+      - type: MULTIPLIER
+        parameters:
+        - '1024'
+      tags:
+      - tag: component
+        value: memory
+    - uuid: b6614543da824551baec06e88b983a8d
+      name: 'Memória: cache'
+      type: SNMP_AGENT
+      snmp_oid: get[1.3.6.1.4.1.2021.4.15.0]
+      key: gwn.mem.cached
+      delay: 2m
+      history: 14d
+      units: B
+      preprocessing:
+      - type: MULTIPLIER
+        parameters:
+        - '1024'
+      tags:
+      - tag: component
+        value: memory
+    - uuid: e10f27b7dfdc413cb0f71daad91236dd
+      name: 'Memória: uso'
+      type: CALCULATED
+      key: gwn.mem.util
+      delay: 2m
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      params: (last(//gwn.mem.total)-(last(//gwn.mem.free)+last(//gwn.mem.buffer)+last(//gwn.mem.cached)))/last(//gwn.mem.total)*100
+      description: 'Mesma conta do template oficial "Linux by SNMP": total - (livre + buffers + cache).'
+      tags:
+      - tag: component
+        value: memory
+    macros:
+    - macro: '{$SITE.GW}'
+      value: ''
+      description: Gateway da rede do equipamento no site (sentinela do túnel).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) por 5 min para alertar.
+    - macro: '{$AP.SNMP.TIMEOUT}'
+      value: 5m
+      description: Tempo sem SNMP (com ping ok) para alertar.
+    - macro: '{$AP.UPTIME.MIN}'
+      value: 10m
+      description: Uptime abaixo disso = "AP reiniciou".
+    - macro: '{$AP.CPU.MAX}'
+      value: '90'
+      description: CPU (%) por 10 min para alertar.
+    - macro: '{$AP.MEM.MAX}'
+      value: '90'
+      description: Memória (%) por 10 min para alertar.
+    - macro: '{$AP.ETH.MIN.MBPS}'
+      value: '1000'
+      description: Velocidade mínima esperada da porta de cabo.
+    - macro: '{$AP.IF.MATCH}'
+      value: ^eth[0-9]+$
+      description: Interfaces descobertas (só as físicas).
+    tags:
+    - tag: area
+      value: wifi
+    - tag: tipo
+      value: ap
+    valuemaps:
+    - uuid: 5f02da165c5546c9bbbd49963691d1ff
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+    - uuid: 340738afe160473b99e7c7327032bf46
+      name: zabbix.host.available
+      mappings:
+      - value: '0'
+        newvalue: sem resposta
+      - value: '1'
+        newvalue: ok
+      - value: '2'
+        newvalue: desconhecido
+    - uuid: 173b3d5599c34ac698e7ac1d92f82823
+      name: IF-MIB::ifOperStatus
+      mappings:
+      - value: '1'
+        newvalue: up
+      - value: '2'
+        newvalue: down
+      - value: '3'
+        newvalue: testing
+      - value: '4'
+        newvalue: unknown
+      - value: '5'
+        newvalue: dormant
+      - value: '6'
+        newvalue: notPresent
+      - value: '7'
+        newvalue: lowerLayerDown
+    discovery_rules:
+    - uuid: e89ccff656f74c4d9f8f6d89ccae8580
+      name: Rádios
+      type: SNMP_AGENT
+      snmp_oid: discovery[{#RADIO},1.3.6.1.4.1.42397.1.1.3.1.1.2]
+      key: gwn.radio.discovery
+      delay: 1h
+      description: 'gwnRadioTable. No GWN7664: wifi0 = 2,4 GHz, wifi1 = 5 GHz.'
+      item_prototypes:
+      - uuid: 329d6c8ad2b44967af28ac09b364ad61
+        name: 'Rádio {#RADIO}: estado'
+        type: SNMP_AGENT
+        snmp_oid: get[1.3.6.1.4.1.42397.1.1.3.1.1.3.{#SNMPINDEX}]
+        key: gwn.radio.status[{#SNMPINDEX}]
+        delay: 2m
+        history: 14d
+        description: 1 = ligado (único valor visto no teste). Qualquer outro valor = rádio desligado.
+        tags:
+        - tag: component
+          value: wifi
+        - tag: radio
+          value: '{#RADIO}'
+        trigger_prototypes:
+        - uuid: 37634166c2124523b2c2b5cf1c3b5c31
+          expression: last(/NOC - AP Grandstream GWN/gwn.radio.status[{#SNMPINDEX}])<>1
+          name: Rádio {#RADIO} desligado
+          event_name: '{HOST.NAME}: rádio {#RADIO} desligado'
+          opdata: 'Estado: {ITEM.LASTVALUE1}'
+          priority: AVERAGE
+          description: O rádio parou (ou foi desligado no GDMS). Os clientes daquela faixa caem para a outra ou para outro AP.
+          dependencies:
+          - name: Sem resposta ao ping
+            expression: max(/NOC - AP Grandstream GWN/icmpping[,3],#3)=0 and last(/NOC - AP Grandstream GWN/icmpping[{$SITE.GW},3])=1
+          tags:
+          - tag: scope
+            value: availability
+      - uuid: 84f72865ddd54333bcd65f7262a3a261
+        name: 'Rádio {#RADIO}: canal'
+        type: SNMP_AGENT
+        snmp_oid: get[1.3.6.1.4.1.42397.1.1.3.1.1.4.{#SNMPINDEX}]
+        key: gwn.radio.channel[{#SNMPINDEX}]
+        delay: 5m
+        history: 30d
+        trends: '0'
+        preprocessing:
+        - type: DISCARD_UNCHANGED_HEARTBEAT
+          parameters:
+          - 1h
+        tags:
+        - tag: component
+          value: wifi
+        - tag: radio
+          value: '{#RADIO}'
+      - uuid: 53ef2475e4e641f7a65711b554e6eeab
+        name: 'Rádio {#RADIO}: potência'
+        type: SNMP_AGENT
+        snmp_oid: get[1.3.6.1.4.1.42397.1.1.3.1.1.5.{#SNMPINDEX}]
+        key: gwn.radio.power[{#SNMPINDEX}]
+        delay: 5m
+        history: 30d
+        units: dBm
+        preprocessing:
+        - type: DISCARD_UNCHANGED_HEARTBEAT
+          parameters:
+          - 1h
+        tags:
+        - tag: component
+          value: wifi
+        - tag: radio
+          value: '{#RADIO}'
+    - uuid: 2c5dd6a03c6742dbb8550a3ef07aafa7
+      name: Portas de rede (cabo)
+      type: SNMP_AGENT
+      snmp_oid: discovery[{#IFNAME},1.3.6.1.2.1.2.2.1.2]
+      key: gwn.eth.discovery
+      delay: 1h
+      description: Só as portas físicas (eth*). As outras interfaces do AP são pontes e SSIDs internos.
+      filter:
+        conditions:
+        - macro: '{#IFNAME}'
+          value: '{$AP.IF.MATCH}'
+          formulaid: A
+      item_prototypes:
+      - uuid: 1fcb5caa039b48c58c9a2690ce502604
+        name: 'Interface {#IFNAME}: Operational status'
+        type: SNMP_AGENT
+        snmp_oid: get[1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}]
+        key: net.if.status[ifOperStatus.{#SNMPINDEX}]
+        delay: 1m
+        history: 14d
+        trends: '0'
+        valuemap:
+          name: IF-MIB::ifOperStatus
+        tags:
+        - tag: component
+          value: network
+        - tag: interface
+          value: '{#IFNAME}'
+      - uuid: c956fa160f35436ba8dcd163c895ebc1
+        name: 'Interface {#IFNAME}: Speed'
+        type: SNMP_AGENT
+        snmp_oid: get[1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}]
+        key: net.if.speed[ifHighSpeed.{#SNMPINDEX}]
+        delay: 5m
+        history: 14d
+        trends: '0'
+        units: bps
+        preprocessing:
+        - type: MULTIPLIER
+          parameters:
+          - '1000000'
+        - type: DISCARD_UNCHANGED_HEARTBEAT
+          parameters:
+          - 1h
+        tags:
+        - tag: component
+          value: network
+        - tag: interface
+          value: '{#IFNAME}'
+      - uuid: ce5956425ffa4b77a8087d014103a99e
+        name: 'Interface {#IFNAME}: Bits received'
+        type: SNMP_AGENT
+        snmp_oid: get[1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}]
+        key: net.if.in[ifHCInOctets.{#SNMPINDEX}]
+        delay: 1m
+        history: 14d
+        units: bps
+        preprocessing:
+        - type: CHANGE_PER_SECOND
+        - type: MULTIPLIER
+          parameters:
+          - '8'
+        tags:
+        - tag: component
+          value: network
+        - tag: interface
+          value: '{#IFNAME}'
+      - uuid: 6226d603648749e5a9517d6b8155798f
+        name: 'Interface {#IFNAME}: Bits sent'
+        type: SNMP_AGENT
+        snmp_oid: get[1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}]
+        key: net.if.out[ifHCOutOctets.{#SNMPINDEX}]
+        delay: 1m
+        history: 14d
+        units: bps
+        preprocessing:
+        - type: CHANGE_PER_SECOND
+        - type: MULTIPLIER
+          parameters:
+          - '8'
+        tags:
+        - tag: component
+          value: network
+        - tag: interface
+          value: '{#IFNAME}'
+      trigger_prototypes:
+      - uuid: e43a93c699624f1da879551ceac402ad
+        name: Porta {#IFNAME} abaixo de {$AP.ETH.MIN.MBPS} Mbps
+        expression: last(/NOC - AP Grandstream GWN/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<{$AP.ETH.MIN.MBPS}*1000000 and last(/NOC - AP Grandstream GWN/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/NOC - AP Grandstream GWN/net.if.status[ifOperStatus.{#SNMPINDEX}])=1
+        event_name: '{HOST.NAME}: porta {#IFNAME} negociou {ITEM.LASTVALUE1}'
+        priority: WARNING
+        description: Ligada, mas abaixo da velocidade esperada. Quase sempre cabo, conector ou porta do switch/PoE.
+        dependencies:
+        - name: Sem resposta ao ping
+          expression: max(/NOC - AP Grandstream GWN/icmpping[,3],#3)=0 and last(/NOC - AP Grandstream GWN/icmpping[{$SITE.GW},3])=1
+        tags:
+        - tag: scope
+          value: performance
+  - uuid: 8d02192c344944f88af511fac0d4a2ba
+    template: NOC - Câmera
+    name: NOC - Câmera
+    description: Câmeras IP. Ping. Alerta só com o túnel no ar (sentinela {$SITE.GW}).
+    groups:
+    - name: Templates/NOC
+    items:
+    - uuid: 3f99de1a231a45eaa1695042454b7479
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: 1m
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: be8ea61064e241ab9c4c4f1d38941886
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 5af8bbf21b644ff792229cd105f5350a
+      name: 'Gateway do site (via túnel): disponível'
+      type: SIMPLE
+      key: icmpping[{$SITE.GW},3]
+      delay: 1m
+      history: 7d
+      valuemap:
+        name: NOC ICMP
+      description: Ping ao gateway da rede deste equipamento no site ({$SITE.GW}). Se ele não responde, o problema é o túnel/roteador, e o alerta do equipamento fica suprimido.
+      tags:
+      - tag: component
+        value: network
+      - tag: component
+        value: sentinela
+    macros:
+    - macro: '{$SITE.GW}'
+      value: ''
+      description: Gateway da rede do equipamento no site (sentinela do túnel).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) por 5 min para alertar.
+    tags:
+    - tag: area
+      value: cftv
+    - tag: tipo
+      value: camera
+    valuemaps:
+    - uuid: f1f6eb9b1a7b4749922ce555dba08d28
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 1bc8bb50627d4f1b963072f529bc4067
+    template: NOC - NVR
+    name: NOC - NVR
+    description: Gravador (NVR). Ping + SNMP genérico (interfaces, uptime).
+    groups:
+    - name: Templates/NOC
+    items:
+    - uuid: d237e1d31b5e4926acdb52f8b747f56f
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: 30s
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: ffdb9f2f25484453b3b86f4a067661c2
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: 30s
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: f4e310b0e3e24e7a8cf761f34aecc566
+      name: 'Gateway do site (via túnel): disponível'
+      type: SIMPLE
+      key: icmpping[{$SITE.GW},3]
+      delay: 30s
+      history: 7d
+      valuemap:
+        name: NOC ICMP
+      description: Ping ao gateway da rede deste equipamento no site ({$SITE.GW}). Se ele não responde, o problema é o túnel/roteador, e o alerta do equipamento fica suprimido.
+      tags:
+      - tag: component
+        value: network
+      - tag: component
+        value: sentinela
+    - uuid: 022cd27630674117b2469bc5f37ab468
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: 30s
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    macros:
+    - macro: '{$SITE.GW}'
+      value: ''
+      description: Gateway da rede do equipamento no site (sentinela do túnel).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) por 5 min para alertar.
+    tags:
+    - tag: area
+      value: cftv
+    - tag: tipo
+      value: nvr
+    valuemaps:
+    - uuid: a0c91928489b4a8bb1799801be8f47b5
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+    templates:
+    - name: Network Generic Device by SNMP
+  - uuid: 9d621b64bef145919e8df6ed1780c395
+    template: NOC - Controle de acesso
+    name: NOC - Controle de acesso
+    description: Controle de acesso. Ping + porta do serviço (padrão 80).
+    groups:
+    - name: Templates/NOC
+    items:
+    - uuid: 05395cb556f440859228af514a8b0517
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: 1m
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: a2cd3f40b5d34f10b41f2f4f206ecf6a
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 757f60cbbdf847e29721d2dce5f4f7e6
+      name: 'Gateway do site (via túnel): disponível'
+      type: SIMPLE
+      key: icmpping[{$SITE.GW},3]
+      delay: 1m
+      history: 7d
+      valuemap:
+        name: NOC ICMP
+      description: Ping ao gateway da rede deste equipamento no site ({$SITE.GW}). Se ele não responde, o problema é o túnel/roteador, e o alerta do equipamento fica suprimido.
+      tags:
+      - tag: component
+        value: network
+      - tag: component
+        value: sentinela
+    - uuid: 5d13c0fbd50841f5be8b16abcc828bd3
+      name: 'Serviço TCP {$SVC.PORT}: disponível'
+      type: SIMPLE
+      key: net.tcp.service[tcp,,{$SVC.PORT}]
+      delay: 1m
+      history: 14d
+      valuemap:
+        name: NOC Serviço
+      tags:
+      - tag: component
+        value: network
+    macros:
+    - macro: '{$SITE.GW}'
+      value: ''
+      description: Gateway da rede do equipamento no site (sentinela do túnel).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) por 5 min para alertar.
+    - macro: '{$SVC.PORT}'
+      value: '80'
+      description: Porta TCP do serviço do equipamento.
+    tags:
+    - tag: area
+      value: acesso
+    - tag: tipo
+      value: controle-acesso
+    valuemaps:
+    - uuid: 30b0a0bdda414a11b3b31bdea8ec281c
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+    - uuid: 5560258a3dab4b3b8d37c35cea98fc8a
+      name: NOC Serviço
+      mappings:
+      - value: '0'
+        newvalue: Fechada
+      - value: '1'
+        newvalue: Aberta
+  - uuid: 59f11f47b55544fbb31e1e307a247c00
+    template: NOC - Dispositivo (ping)
+    name: NOC - Dispositivo (ping)
+    description: Qualquer equipamento só por ping (AP sem SNMP, NAS, interfone, impressora...). Alerta só com o caminho até o site no ar (sentinela {$SITE.GW}).
+    groups:
+    - name: Templates/NOC
+    items:
+    - uuid: cb1a2d943ae94001a80070db0393b926
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: 1m
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: e5a8e1831f414e6682f767c742f8fcbe
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 3304b47a0359493c952ccc0dfbdadd6a
+      name: 'Gateway do site (via túnel): disponível'
+      type: SIMPLE
+      key: icmpping[{$SITE.GW},3]
+      delay: 1m
+      history: 7d
+      valuemap:
+        name: NOC ICMP
+      description: Ping ao gateway da rede deste equipamento no site ({$SITE.GW}). Se ele não responde, o problema é o túnel/roteador, e o alerta do equipamento fica suprimido.
+      tags:
+      - tag: component
+        value: network
+      - tag: component
+        value: sentinela
+    macros:
+    - macro: '{$SITE.GW}'
+      value: ''
+      description: Gateway da rede do equipamento no site (sentinela do túnel).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) por 5 min para alertar.
+    tags:
+    - tag: area
+      value: cftv
+    - tag: tipo
+      value: camera
+    valuemaps:
+    - uuid: 4426995dbfc349f2a4f37c307d6b1ab6
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 84207ea4c2d3428f8e2bffe69b8db015
+    template: NOC - Link WAN
+    name: NOC - Link WAN
+    description: 'Link de internet visto do Zabbix da nuvem: ping ao IP público ({$LINK.IP}), ao gateway da operadora ({$LINK.GW}) e ao IP do túnel VPN ({$VPN.IP}). Gateway fora = operadora; só IP público fora = RB; só túnel fora = VPN.'
+    groups:
+    - name: Templates/NOC
+    items:
+    - uuid: 3ffde9bf8dde4dd19c67ccef2aa12504
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[{$LINK.IP},3]
+      delay: 30s
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: Ping (3 pacotes) do Zabbix da nuvem ao IP público do link ({$LINK.IP}). 1 = responde.
+      tags: &id001
+      - &id002
+        tag: component
+        value: network
+    - uuid: a2bc26b15f6140e29bb8b3fdc2fcd33c
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[{$LINK.IP},3]
+      delay: 30s
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags: *id001
+    - uuid: 39456fee822144cca2291a967b715386
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[{$LINK.IP},3,,,,avg]
+      delay: 30s
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags: *id001
+    - uuid: 8babe64aacfc40cab75ce793d628f3e9
+      name: 'Gateway da operadora: disponível'
+      type: SIMPLE
+      key: icmpping[{$LINK.GW},3]
+      delay: 30s
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: Ping ao gateway da operadora ({$LINK.GW}). Gateway responde e IP público não = problema na RB, não na operadora.
+      tags: *id001
+    - uuid: 106047b3fe114f2086d5f5923b945957
+      name: 'Túnel VPN: disponível'
+      type: SIMPLE
+      key: icmpping[{$VPN.IP},3]
+      delay: 30s
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 'Ping ao IP do túnel ({$VPN.IP}). Só alerta quando o IP público responde (senão o problema é o link). Link sem túnel: desabilite este item no host.'
+      tags:
+      - *id002
+      - tag: component
+        value: vpn
+    - uuid: 343fa92170bd44e1b7323dcba8171704
+      name: 'ICMP: variação da latência (jitter 5m)'
+      type: CALCULATED
+      key: link.jitter
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      units: s
+      params: stddevpop(//icmppingsec[{$LINK.IP},3,,,,avg],5m)
+      description: Desvio padrão da latência média nos últimos 5 min (aproximação de jitter).
+      tags: *id001
+    macros:
+    - macro: '{$LINK.IP}'
+      value: ''
+      description: IP público do link (da RB). Definir no host.
+    - macro: '{$LINK.GW}'
+      value: ''
+      description: Gateway da operadora. Definir no host.
+    - macro: '{$VPN.IP}'
+      value: ''
+      description: IP do túnel VPN do lado remoto. Definir no host.
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) sustentada por 5 min para alertar.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.08'
+      description: Latência média (s) por 5 min para alertar.
+    - macro: '{$LINK.JITTER.WARN}'
+      value: '0.02'
+      description: Jitter (s) sustentado por 10 min para alertar.
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: link
+    valuemaps:
+    - uuid: d6cdc63349164c82bb25e13bb599fba8
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: a65d36017a144fd2878ef6e2f5dc7e80
+    template: NOC - MikroTik WAN DHCP
+    name: NOC - MikroTik WAN DHCP
+    description: 'Link de internet atrás de um roteador da operadora, com IP por DHCP client na RB (ex.: Beta banda larga). Sem IP público para pingar da nuvem: o Zabbix confere, por SNMP, se a RB tem IP da faixa da operadora.'
+    groups:
+    - name: Templates/NOC
+    items:
+    - uuid: 7a67b2ff9aae43119399932be1fe40be
+      name: Tabela de IPs da RB (bruto)
+      type: SNMP_AGENT
+      snmp_oid: walk[1.3.6.1.2.1.4.20.1.1]
+      key: wan.dhcp.walk
+      delay: 1m
+      history: 1d
+      value_type: TEXT
+      trends: '0'
+      description: 'IP-MIB ipAdEntAddr: todos os IPs atribuídos às interfaces da RB, inclusive o que o DHCP client recebe da operadora.'
+      tags:
+      - tag: component
+        value: raw
+    - uuid: 2dcfbf26af954e6f912ecb98348c48a5
+      name: 'WAN {$WAN.DHCP.NOME}: DHCP client com IP'
+      type: DEPENDENT
+      key: wan.dhcp.ok
+      delay: '0'
+      history: 14d
+      valuemap:
+        name: NOC DHCP
+      master_item:
+        key: wan.dhcp.walk
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - 'var p = ''{$WAN.DHCP.PREFIX}'';
+
+          return value.indexOf(p) >= 0 ? 1 : 0;'
+      description: '1 = a RB tem um IP da faixa {$WAN.DHCP.PREFIX} (lease do DHCP client ativo). 0 = sem IP: link de reserva sem conexão com o roteador da operadora.'
+      tags:
+      - tag: component
+        value: network
+      - tag: component
+        value: wan
+    - uuid: 9e9c1495f1484b33b7ed0242d7df39e9
+      name: 'WAN {$WAN.DHCP.NOME}: IP recebido'
+      type: DEPENDENT
+      key: wan.dhcp.ip
+      delay: '0'
+      history: 14d
+      value_type: CHAR
+      trends: '0'
+      master_item:
+        key: wan.dhcp.walk
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - 'var p = ''{$WAN.DHCP.PREFIX}'';
+
+          var m = value.split(''\n'').filter(function (l) { return l.indexOf('': '' + p) >= 0; });
+
+          return m.length ? m[0].split('': '').pop().trim() : ''sem IP'';'
+      - type: DISCARD_UNCHANGED_HEARTBEAT
+        parameters:
+        - 1h
+      tags:
+      - tag: component
+        value: wan
+    macros:
+    - macro: '{$WAN.DHCP.PREFIX}'
+      value: 192.168.150.
+      description: Início da faixa entregue pela operadora (com ponto no final).
+    - macro: '{$WAN.DHCP.NOME}'
+      value: BETA
+      description: Nome do link nos alertas.
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: link
+    valuemaps:
+    - uuid: 28536593b3a14a089c21a4db12112829
+      name: NOC DHCP
+      mappings:
+      - value: '0'
+        newvalue: Sem IP
+      - value: '1'
+        newvalue: Com IP
+  - uuid: 266b61f5192b440f948ccb2e8fa527c6
+    template: NOC - pfSense OpenVPN
+    name: NOC - pfSense OpenVPN
+    groups:
+    - name: Templates/NOC
+    description: 'Acessos OpenVPN do pfSense e eventos de segurança (falhas de login VPN/webGUI/SSH, mudanças de configuração): lê /usr/local/zbx_ovpn/ovpn.json (coletor zbx_ovpn.php no cron). Vincular só no host do pfSense que tem o OpenVPN.'
+    items:
+    - uuid: 3e645c3a717b4ed3a0f3e68d4839e7db
+      name: 'OpenVPN: dados (JSON)'
+      type: ZABBIX_PASSIVE
+      key: vfs.file.contents[{$OVPN.ARQ}]
+      delay: 2m
+      history: 1d
+      trends: '0'
+      value_type: TEXT
+      tags:
+      - tag: component
+        value: vpn
+      description: 'JSON do coletor zbx_ovpn.php (cron a cada 2 min no pfSense). A tela "NOC — Acessos VPN" lê este item. Histórico curto: é grande e só o último interessa.'
+    - uuid: 222347e48ca54f64948123c0870764df
+      name: 'OpenVPN: hora da última coleta'
+      type: ZABBIX_PASSIVE
+      key: vfs.file.time[{$OVPN.ARQ},modify]
+      delay: 2m
+      history: 7d
+      units: unixtime
+      tags:
+      - tag: component
+        value: vpn
+      triggers:
+      - uuid: 866e25de3d1f4f3dbcda2bee4e6cda1c
+        expression: fuzzytime(/NOC - pfSense OpenVPN/vfs.file.time[{$OVPN.ARQ},modify],{$OVPN.ATRASO})=0
+        name: Coletor da VPN parado
+        event_name: '{HOST.NAME}: coletor da VPN sem atualizar há mais de {$OVPN.ATRASO}'
+        priority: WARNING
+        description: 'O arquivo do coletor não é atualizado. Confira no pfSense: Services → Cron (linha do zbx_ovpn.php) e rode o script à mão.'
+        tags:
+        - tag: component
+          value: vpn
+        - tag: scope
+          value: availability
+    - uuid: fd0ee522738347828cf65ad7757a8a3b
+      name: 'OpenVPN: usuários conectados'
+      type: DEPENDENT
+      key: ovpn.conectados
+      history: 30d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.resumo.conectados
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+    - uuid: 005e8042fcab49b5a3e26a924ed6c099
+      name: 'OpenVPN: usuários conhecidos'
+      type: DEPENDENT
+      key: ovpn.usuarios
+      history: 30d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.resumo.usuarios
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+    - uuid: 649c0a9b1dc441bba28de8cba579ead9
+      name: 'OpenVPN: certificados de usuário vencendo'
+      type: DEPENDENT
+      key: ovpn.cert.vencendo
+      history: 30d
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - 'var j = JSON.parse(value), t = j.ts;
+
+          return j.certificados.filter(function (c) { return c.tipo === ''usuario'' && !c.revogado && c.vence >= t && c.vence - t <= 15 * 86400; }).length;'
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      description: Certificados de usuário (não revogados) que vencem em até 15 dias.
+    - uuid: abc9c71e5b4e44a3aab04f5d515cbc71
+      name: 'OpenVPN: certificados de usuário vencidos'
+      type: DEPENDENT
+      key: ovpn.cert.vencidos
+      history: 30d
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - 'var j = JSON.parse(value), t = j.ts;
+
+          return j.certificados.filter(function (c) { return c.tipo === ''usuario'' && !c.revogado && c.vence < t; }).length;'
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+    - uuid: 809d9c8412b54355990846eac68058ac
+      name: 'OpenVPN: usuários sem conexão há 45+ dias'
+      type: DEPENDENT
+      key: ovpn.inativos45
+      history: 30d
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - 'var j = JSON.parse(value), t = j.ts;
+
+          return j.usuarios.filter(function (u) { return !u.on && !u.desabilitado && u.ultima && t - u.ultima >= 45 * 86400; }).length;'
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+    - uuid: d5a897c079fe41e9bbbd7668763eb683
+      name: 'VPN: usuários recusados na última hora (todas as VPNs)'
+      type: DEPENDENT
+      key: ovpn.seg.vpn.recusados1h
+      history: 30d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.seguranca.vpn.recusados_1h
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      - tag: component
+        value: security
+      description: Linhas "user X could not authenticate" do script de autenticação do pfSense (senha errada, usuário inexistente, CN diferente). Não diz o servidor.
+    - uuid: 402f9c50cc5a48d89c5577bc9e67d534
+      name: 'VPN: falhas de autenticação na última hora (registradas pelo servidor)'
+      type: DEPENDENT
+      key: ovpn.seg.vpn.falhas1h
+      history: 30d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.seguranca.vpn.falhas_1h
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      - tag: component
+        value: security
+    - uuid: 5f2fc57b4d364b03ac9a9a5be484406d
+      name: 'VPN: ruído TLS/varredura em 24 h'
+      type: DEPENDENT
+      key: ovpn.seg.vpn.ruido24h
+      history: 30d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.seguranca.vpn.ruido_24h
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      - tag: component
+        value: security
+      description: 'Handshakes TLS que não completam, pacotes sem HMAC válido: varredura de porta ou cliente mal configurado. Normal existir; só preocupa se explodir.'
+    - uuid: 3c60908bec1d46c794d7d9ec7accbb5a
+      name: 'webGUI: falhas de login na última hora'
+      type: DEPENDENT
+      key: ovpn.seg.gui.falhas1h
+      history: 30d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.seguranca.gui.falhas_1h
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      - tag: component
+        value: security
+    - uuid: d2a6f77148dc477d952867e5470f869e
+      name: 'SSH: falhas de login na última hora'
+      type: DEPENDENT
+      key: ovpn.seg.ssh.falhas1h
+      history: 30d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.seguranca.ssh.falhas_1h
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      - tag: component
+        value: security
+    - uuid: eef2ed9849814ed28ad65779bc0af857
+      name: 'sshguard: IPs bloqueados em 24 h'
+      type: DEPENDENT
+      key: ovpn.seg.ssh.bloq24h
+      history: 30d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.seguranca.ssh.bloqueios_24h
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      - tag: component
+        value: security
+      description: O sshguard bloqueia IPs que erram login no SSH ou no webGUI (Login Protection do pfSense).
+    - uuid: 5333362ae82b40199c9df37a075b5c7a
+      name: 'Configuração: hora da última mudança'
+      type: DEPENDENT
+      key: ovpn.seg.cfg.ts
+      history: 90d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.seguranca.config.ultima_ts
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      - tag: component
+        value: security
+      units: unixtime
+    - uuid: 73e66c68cfbc494ca22c6dea463f0f9f
+      name: 'Configuração: última mudança (quem e o quê)'
+      type: DEPENDENT
+      key: ovpn.seg.cfg.desc
+      history: 90d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.seguranca.config.ultima
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      - tag: component
+        value: security
+      value_type: TEXT
+      trends: '0'
+    - uuid: 1963dbae9a2940c1a5a4c1b61fd2e5f0
+      name: 'Configuração: mudanças em 24 h'
+      type: DEPENDENT
+      key: ovpn.seg.cfg.24h
+      history: 30d
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.seguranca.config.mudancas_24h
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      tags:
+      - tag: component
+        value: vpn
+      - tag: component
+        value: security
+    discovery_rules:
+    - uuid: c2cdc737545b40ea8fc3f66ba4e3404a
+      name: Servidores OpenVPN
+      type: DEPENDENT
+      key: ovpn.srv.discovery
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      lifetime: 7d
+      lld_macro_paths:
+      - lld_macro: '{#SRVID}'
+        path: $.id
+      - lld_macro: '{#SRVNOME}'
+        path: $.nome
+      - lld_macro: '{#DESAB}'
+        path: $.desabilitado
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.servidores
+      - type: DISCARD_UNCHANGED_HEARTBEAT
+        parameters:
+        - 1h
+      filter:
+        conditions:
+        - macro: '{#DESAB}'
+          value: ^true$
+          operator: NOT_MATCHES_REGEX
+          formulaid: A
+      item_prototypes:
+      - uuid: d6f0cc0ee98549f8941e4412e6bc2fd5
+        name: 'OpenVPN {#SRVNOME}: no ar'
+        type: DEPENDENT
+        key: ovpn.srv.up[{#SRVID}]
+        history: 30d
+        master_item:
+          key: vfs.file.contents[{$OVPN.ARQ}]
+        valuemap:
+          name: NOC VPN no ar
+        tags:
+        - tag: component
+          value: vpn
+        - tag: vpn
+          value: '{#SRVNOME}'
+        preprocessing:
+        - type: JSONPATH
+          parameters:
+          - $.servidores[?(@.id == '{#SRVID}')].no_ar.first()
+        - type: JAVASCRIPT
+          parameters:
+          - 'return value === ''true'' || value === ''1'' ? 1 : 0;'
+        trigger_prototypes:
+        - uuid: 792df6c7cea040b3a93cd39a43b57f5a
+          expression: max(/NOC - pfSense OpenVPN/ovpn.srv.up[{#SRVID}],#2)=0
+          name: Servidor OpenVPN {#SRVNOME} parado
+          event_name: '{HOST.NAME}: servidor OpenVPN {#SRVNOME} parado'
+          priority: HIGH
+          description: O serviço não está rodando (sem socket de gerência e sem conexões). Status → Services no pfSense.
+          tags:
+          - tag: component
+            value: vpn
+          - tag: scope
+            value: availability
+      - uuid: 38094fd24ebf4db89be0de98d0f9d29b
+        name: 'OpenVPN {#SRVNOME}: conectados'
+        type: DEPENDENT
+        key: ovpn.srv.conectados[{#SRVID}]
+        history: 30d
+        master_item:
+          key: vfs.file.contents[{$OVPN.ARQ}]
+        tags:
+        - tag: component
+          value: vpn
+        - tag: vpn
+          value: '{#SRVNOME}'
+        preprocessing:
+        - type: JSONPATH
+          parameters:
+          - $.servidores[?(@.id == '{#SRVID}')].conectados.first()
+      - uuid: 1e4e8f894dc54c3c87e9b946fdfcb5b2
+        name: 'OpenVPN {#SRVNOME}: falhas de autenticação na última hora'
+        type: DEPENDENT
+        key: ovpn.srv.falhas1h[{#SRVID}]
+        history: 30d
+        master_item:
+          key: vfs.file.contents[{$OVPN.ARQ}]
+        tags:
+        - tag: component
+          value: vpn
+        - tag: component
+          value: security
+        - tag: vpn
+          value: '{#SRVNOME}'
+        preprocessing:
+        - type: JSONPATH
+          parameters:
+          - $.servidores[?(@.id == '{#SRVID}')].falhas_1h.first()
+        - type: JAVASCRIPT
+          parameters:
+          - 'return value === "" ? 0 : value;'
+        description: 'Falhas registradas pelo próprio processo do servidor (tem IP de origem). Zero sempre pode significar que este servidor não registra a falha: compare com "usuários recusados".'
+    - uuid: d9441186e6f74625847720b474c8ad6d
+      name: Certificados da VPN (CA, servidores e túneis)
+      type: DEPENDENT
+      key: ovpn.cert.discovery
+      master_item:
+        key: vfs.file.contents[{$OVPN.ARQ}]
+      lifetime: 7d
+      lld_macro_paths:
+      - lld_macro: '{#REF}'
+        path: $.ref
+      - lld_macro: '{#NOME}'
+        path: $.nome
+      - lld_macro: '{#TIPO}'
+        path: $.tipo
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.certificados
+      - type: DISCARD_UNCHANGED_HEARTBEAT
+        parameters:
+        - 1h
+      filter:
+        conditions:
+        - macro: '{#TIPO}'
+          value: ^(ca|servidor|par)$
+          formulaid: A
+      description: 'CA, certificados de servidor e do outro lado dos túneis entre sites (ex.: o roteador de um site): se um deles vence, o servidor inteiro ou o túnel para.'
+      item_prototypes:
+      - uuid: 435f7e8d34de440284715badabc17a90
+        name: 'Certificado {#TIPO} {#NOME}: dias para vencer'
+        type: DEPENDENT
+        key: ovpn.cert.dias[{#REF}]
+        history: 90d
+        master_item:
+          key: vfs.file.contents[{$OVPN.ARQ}]
+        tags:
+        - tag: component
+          value: vpn
+        - tag: cert
+          value: '{#NOME}'
+        preprocessing:
+        - type: JSONPATH
+          parameters:
+          - $.certificados[?(@.ref == '{#REF}')].vence.first()
+        - type: JAVASCRIPT
+          parameters:
+          - return Math.floor((Number(value) - Date.now() / 1000) / 86400);
+        trigger_prototypes:
+        - uuid: 7e1f61bf102040a39fb18156a0e47962
+          expression: last(/NOC - pfSense OpenVPN/ovpn.cert.dias[{#REF}])<={$OVPN.CERT.CRIT}
+          name: Certificado {#TIPO} da VPN {#NOME} vence em até {$OVPN.CERT.CRIT} dias
+          event_name: '{HOST.NAME}: certificado {#TIPO} da VPN "{#NOME}" — {ITEM.LASTVALUE1} dia(s) para vencer'
+          priority: HIGH
+          description: Vencido = ninguém conecta naquele(s) servidor(es). Renove em System → Cert. Manager e reexporte os clientes se a CA mudar.
+          tags:
+          - tag: component
+            value: vpn
+          - tag: scope
+            value: availability
+        - uuid: 7bad047772ae4bfbadcd1630be13b402
+          expression: last(/NOC - pfSense OpenVPN/ovpn.cert.dias[{#REF}])<={$OVPN.CERT.AVISO}
+          name: Certificado {#TIPO} da VPN {#NOME} vence em até {$OVPN.CERT.AVISO} dias
+          event_name: '{HOST.NAME}: certificado {#TIPO} da VPN "{#NOME}" — {ITEM.LASTVALUE1} dia(s) para vencer'
+          priority: WARNING
+          dependencies:
+          - name: Certificado {#TIPO} da VPN {#NOME} vence em até {$OVPN.CERT.CRIT} dias
+            expression: last(/NOC - pfSense OpenVPN/ovpn.cert.dias[{#REF}])<={$OVPN.CERT.CRIT}
+          tags:
+          - tag: component
+            value: vpn
+          - tag: scope
+            value: notice
+    macros:
+    - macro: '{$OVPN.ARQ}'
+      value: /usr/local/zbx_ovpn/ovpn.json
+      description: Arquivo gerado pelo coletor.
+    - macro: '{$OVPN.ATRASO}'
+      value: 10m
+      description: Sem atualização por mais que isso = coletor parado.
+    - macro: '{$OVPN.CERT.AVISO}'
+      value: '30'
+      description: 'Dias para vencer (CA/servidor): Warning.'
+    - macro: '{$OVPN.CERT.CRIT}'
+      value: '7'
+      description: 'Dias para vencer (CA/servidor): High.'
+    - macro: '{$OVPN.FALHAS.1H}'
+      value: '20'
+      description: Falhas de login na VPN em 1 h para alertar.
+    - macro: '{$GUI.FALHAS.1H}'
+      value: '3'
+      description: Falhas de login no webGUI em 1 h para alertar.
+    - macro: '{$SSH.FALHAS.1H}'
+      value: '3'
+      description: Falhas de login no SSH em 1 h para alertar.
+    tags:
+    - tag: area
+      value: vpn
+    valuemaps:
+    - uuid: eca9863e7bca4454baa5e15f58273fef
+      name: NOC VPN no ar
+      mappings:
+      - value: '0'
+        newvalue: Parado
+      - value: '1'
+        newvalue: No ar
+  - uuid: 45b91d14b21f488d8a194a810c2e52e2
+    template: NOC - Website HTTPS
+    name: NOC - Website HTTPS
+    description: 'Customizações da NOC sobre o template oficial "Website certificate by Zabbix agent 2" (aninhado).
+
+      NÃO editar o template oficial; customizações ficam aqui.
+
+      - Web scenario "Disponibilidade HTTPS": SEM HTTP proxy (proxy = próprio site causou falso positivo em 2026-09).
+
+      - Trigger nodata de 8h: o master Cert: Get tem "Discard unchanged with heartbeat 6h"; nodata menor que isso gera alarme falso.
+
+      - Se o template oficial for atualizado para a versão LLD (7.4+), a key cert.not_after muda e o trigger nodata precisa ser ajustado.
+
+      '
+    templates:
+    - name: Website certificate by Zabbix agent 2
+    groups:
+    - name: Templates/NOC
+    httptests:
+    - uuid: 80af81124d204bf58eeb39e0791c0f4e
+      name: Disponibilidade HTTPS
+      delay: 5m
+      attempts: '2'
+      steps:
+      - name: GET
+        url: https://{$CERT.WEBSITE.HOSTNAME}:{$CERT.WEBSITE.PORT}
+        timeout: 15s
+        status_codes: '200'
+      tags:
+      - tag: component
+        value: availability
+    tags: []
+  - uuid: 6eff0805a1e84a07a50ed6d389ffb1ac
+    template: NOC - WireGuard
+    name: NOC - WireGuard
+    description: 'Monitora os peers do WireGuard via UserParameter (script /usr/local/bin/zbx-wg.sh no host).
+
+      Handshake: segundos desde o último handshake (-1 = nunca houve).
+
+      Alerta só quando {$WG.ALERTA} = 1 no host (túnel do evento: deixar 0 fora das etapas).
+
+      '
+    groups:
+    - name: Templates/NOC
+    discovery_rules:
+    - uuid: 3c5ac605e18b4799bbd92bec7abd3720
+      name: 'WireGuard: descoberta de peers'
+      key: wg.discovery
+      delay: 10m
+      lifetime: 7d
+      item_prototypes:
+      - uuid: a71b9844d57740688ca9b3e0e1a233f4
+        name: 'WG {#WGIF} peer {#WGALLOWED}: tempo desde o último handshake'
+        key: wg.handshake[{#WGIF},{#WGPEER}]
+        delay: 1m
+        value_type: FLOAT
+        units: s
+        tags:
+        - tag: component
+          value: wireguard
+        trigger_prototypes:
+        - uuid: ba853e4af8014b60be7df7d084f57116
+          expression: '{$WG.ALERTA}=1 and (last(/NOC - WireGuard/wg.handshake[{#WGIF},{#WGPEER}])>{$WG.HANDSHAKE.MAX} or last(/NOC - WireGuard/wg.handshake[{#WGIF},{#WGPEER}])<0)'
+          name: Túnel WireGuard {#WGIF} sem handshake (peer {#WGALLOWED})
+          priority: HIGH
+          description: O peer não faz handshake há mais de {$WG.HANDSHAKE.MAX} segundos. Com PersistentKeepalive ativo, o handshake se renova a cada ~2 min enquanto o túnel está de pé.
+          tags:
+          - tag: scope
+            value: availability
+      - uuid: 82a2c5d89adf4adf832158c6506b1951
+        name: 'WG {#WGIF} peer {#WGALLOWED}: tráfego recebido'
+        key: wg.rx[{#WGIF},{#WGPEER}]
+        delay: 1m
+        value_type: FLOAT
+        units: bps
+        preprocessing:
+        - type: CHANGE_PER_SECOND
+          parameters:
+          - ''
+        - type: MULTIPLIER
+          parameters:
+          - '8'
+        tags:
+        - tag: component
+          value: wireguard
+      - uuid: fd37c3af933d4af5aa02654d192655e6
+        name: 'WG {#WGIF} peer {#WGALLOWED}: tráfego enviado'
+        key: wg.tx[{#WGIF},{#WGPEER}]
+        delay: 1m
+        value_type: FLOAT
+        units: bps
+        preprocessing:
+        - type: CHANGE_PER_SECOND
+          parameters:
+          - ''
+        - type: MULTIPLIER
+          parameters:
+          - '8'
+        tags:
+        - tag: component
+          value: wireguard
+    macros:
+    - macro: '{$WG.ALERTA}'
+      value: '1'
+      description: 1 = alerta quando o túnel cai; 0 = não alerta (fora de evento)
+    - macro: '{$WG.HANDSHAKE.MAX}'
+      value: '300'
+      description: Segundos sem handshake até alertar
+    tags: []
+  triggers:
+  - uuid: 8f1dafb099af4696b8976e7007726a2f
+    name: Sem resposta ao ping
+    expression: max(/NOC - Câmera/icmpping[,3],#3)=0 and last(/NOC - Câmera/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: WARNING
+    description: 3 coletas seguidas sem resposta, com o gateway do site respondendo (túnel ok). Verifique energia, cabo e a porta do switch/PoE.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 69d6225c0ea54503b37a6d6be86df525
+    name: Perda de pacotes alta
+    expression: min(/NOC - Câmera/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC - Câmera/icmppingloss[,3],5m)<100 and last(/NOC - Câmera/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME}: perda acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - Câmera/icmpping[,3],#3)=0 and last(/NOC - Câmera/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 057f3d61c706472d82bed0489f6145f1
+    name: Sem resposta ao ping
+    expression: max(/NOC - Controle de acesso/icmpping[,3],#3)=0 and last(/NOC - Controle de acesso/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: AVERAGE
+    description: 3 coletas seguidas sem resposta, com o gateway do site respondendo (túnel ok). Verifique energia, cabo e a porta do switch/PoE.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: c85330ef8e9148e68cc6bd8e07bb3040
+    name: Perda de pacotes alta
+    expression: min(/NOC - Controle de acesso/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC - Controle de acesso/icmppingloss[,3],5m)<100 and last(/NOC - Controle de acesso/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME}: perda acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - Controle de acesso/icmpping[,3],#3)=0 and last(/NOC - Controle de acesso/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 0870f6351e9a4513b567229e7e139610
+    name: Porta {$SVC.PORT} não responde
+    expression: max(/NOC - Controle de acesso/net.tcp.service[tcp,,{$SVC.PORT}],#3)=0 and last(/NOC - Controle de acesso/icmpping[,3])=1
+    event_name: '{HOST.NAME}: porta {$SVC.PORT} fechada (equipamento responde ao ping)'
+    priority: AVERAGE
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - Controle de acesso/icmpping[,3],#3)=0 and last(/NOC - Controle de acesso/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 6e0ad680d117480299fddc38f070a114
+    name: Sem resposta ao ping
+    expression: max(/NOC - NVR/icmpping[,3],#3)=0 and last(/NOC - NVR/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    description: 3 coletas seguidas sem resposta, com o gateway do site respondendo (túnel ok). Verifique energia, cabo e a porta do switch/PoE.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 00c736dabbe545ba85fd1c3fe388ad17
+    name: Perda de pacotes alta
+    expression: min(/NOC - NVR/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC - NVR/icmppingloss[,3],5m)<100 and last(/NOC - NVR/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME}: perda acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - NVR/icmpping[,3],#3)=0 and last(/NOC - NVR/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 440623487e5549c5a7a7083efa8adb21
+    name: Sem resposta ao ping
+    expression: max(/NOC - Switch/icmpping[,3],#3)=0 and last(/NOC - Switch/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    description: 3 coletas seguidas sem resposta, com o gateway do site respondendo (túnel ok). Verifique energia, cabo e a porta do switch/PoE.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: bf5baeac8a5a49658c9ba9d3dfaa78e1
+    name: Perda de pacotes alta
+    expression: min(/NOC - Switch/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC - Switch/icmppingloss[,3],5m)<100 and last(/NOC - Switch/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME}: perda acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - Switch/icmpping[,3],#3)=0 and last(/NOC - Switch/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 263e322da3a649a8bdebf83bbd71b3ba
+    name: Sem resposta ao ping
+    expression: max(/NOC - AP Grandstream GWN/icmpping[,3],#3)=0 and last(/NOC - AP Grandstream GWN/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: AVERAGE
+    description: 3 coletas seguidas sem resposta, com o gateway do site respondendo (túnel ok). Verifique energia, cabo e a porta do switch/PoE.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 0ce8f615ac6b4a578e71be39e2342ff3
+    name: Perda de pacotes alta
+    expression: min(/NOC - AP Grandstream GWN/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC - AP Grandstream GWN/icmppingloss[,3],5m)<100 and last(/NOC - AP Grandstream GWN/icmpping[{$SITE.GW},3])=1
+    event_name: '{HOST.NAME}: perda acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - AP Grandstream GWN/icmpping[,3],#3)=0 and last(/NOC - AP Grandstream GWN/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 6331197e3d6d4fa4a712d99b5fff1c97
+    name: SNMP sem resposta
+    expression: max(/NOC - AP Grandstream GWN/zabbix[host,snmp,available],{$AP.SNMP.TIMEOUT})=0 and last(/NOC - AP Grandstream GWN/icmpping[,3])=1
+    event_name: '{HOST.NAME}: SNMP sem resposta (ping ok)'
+    opdata: 'Estado: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    description: O AP responde ao ping, mas não ao SNMP. Confira o SNMP no GDMS (Configurações → Sistema → SNMP) e a community no macro global {$SNMP_COMMUNITY}.
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - AP Grandstream GWN/icmpping[,3],#3)=0 and last(/NOC - AP Grandstream GWN/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: dd8af5e6952144d0812f31dc8fe8c7ea
+    name: AP reiniciou
+    expression: last(/NOC - AP Grandstream GWN/gwn.uptime)<{$AP.UPTIME.MIN}
+    event_name: '{HOST.NAME} reiniciou (ligado há {ITEM.LASTVALUE1})'
+    priority: INFO
+    description: Uptime menor que {$AP.UPTIME.MIN}. Some sozinho depois disso. Vários APs juntos = reinício programado do GDMS ou queda de energia/PoE.
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - AP Grandstream GWN/icmpping[,3],#3)=0 and last(/NOC - AP Grandstream GWN/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: notice
+  - uuid: f29ff4d3a3b84893a208005104605447
+    name: CPU alta
+    expression: min(/NOC - AP Grandstream GWN/gwn.cpu.util,10m)>{$AP.CPU.MAX}
+    event_name: '{HOST.NAME}: CPU acima de {$AP.CPU.MAX}% por 10 min'
+    opdata: 'CPU: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - AP Grandstream GWN/icmpping[,3],#3)=0 and last(/NOC - AP Grandstream GWN/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: c533e647db9a4728b6731ca9dfa9b024
+    name: Memória alta
+    expression: min(/NOC - AP Grandstream GWN/gwn.mem.util,10m)>{$AP.MEM.MAX}
+    event_name: '{HOST.NAME}: memória acima de {$AP.MEM.MAX}% por 10 min'
+    opdata: 'Memória: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC - AP Grandstream GWN/icmpping[,3],#3)=0 and last(/NOC - AP Grandstream GWN/icmpping[{$SITE.GW},3])=1
+    tags:
+    - tag: scope
+      value: capacity
+  - uuid: 13f122c897a445e985d600db19a292c2
+    name: Gateway da operadora sem resposta
+    expression: max(/NOC - Link WAN/icmpping[{$LINK.GW},3],#3)=0
+    event_name: '{HOST.NAME}: gateway da operadora ({$LINK.GW}) sem resposta'
+    priority: HIGH
+    description: O gateway da operadora não responde ao Zabbix da nuvem. Provável queda do link na operadora.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 6b30fd5b8a8a45bd84fc85d7e1ead766
+    name: Link sem resposta (IP público)
+    expression: max(/NOC - Link WAN/icmpping[{$LINK.IP},3],#3)=0
+    event_name: '{HOST.NAME}: IP público {$LINK.IP} sem resposta'
+    priority: HIGH
+    dependencies:
+    - name: Gateway da operadora sem resposta
+      expression: max(/NOC - Link WAN/icmpping[{$LINK.GW},3],#3)=0
+    description: 'O IP público da RB não responde, mas o gateway da operadora sim: problema na RB (energia, travamento, firewall bloqueando ICMP).'
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 7cd206450cbe4e8884b000493cfb467e
+    name: Túnel VPN fora com link no ar
+    expression: max(/NOC - Link WAN/icmpping[{$VPN.IP},3],#3)=0 and last(/NOC - Link WAN/icmpping[{$LINK.IP},3])=1
+    event_name: '{HOST.NAME}: túnel VPN ({$VPN.IP}) sem resposta, link no ar'
+    priority: HIGH
+    description: 'O link responde pelo IP público, mas o IP do túnel não: a VPN caiu (cliente OpenVPN na RB ou servidor no pfSense).'
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 49c23f1f0c14418688005ab5d447cec3
+    name: Perda de pacotes alta no link
+    expression: min(/NOC - Link WAN/icmppingloss[{$LINK.IP},3],5m)>{$ICMP.LOSS.WARN} and min(/NOC - Link WAN/icmppingloss[{$LINK.IP},3],5m)<100
+    event_name: '{HOST.NAME}: perda acima de {$ICMP.LOSS.WARN}% por 5 min'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Link sem resposta (IP público)
+      expression: max(/NOC - Link WAN/icmpping[{$LINK.IP},3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: b56743e7641d49f18c9fc16c8c1451c5
+    name: Latência alta no link
+    expression: avg(/NOC - Link WAN/icmppingsec[{$LINK.IP},3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Link sem resposta (IP público)
+      expression: max(/NOC - Link WAN/icmpping[{$LINK.IP},3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 6e6add6889874c87991a56f0629c851c
+    name: Jitter alto no link
+    expression: min(/NOC - Link WAN/link.jitter,10m)>{$LINK.JITTER.WARN}
+    event_name: '{HOST.NAME}: jitter acima de {$LINK.JITTER.WARN}s por 10 min'
+    opdata: 'Jitter: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Link sem resposta (IP público)
+      expression: max(/NOC - Link WAN/icmpping[{$LINK.IP},3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: faa7202892fe4aefb0743cc32cc3f04c
+    name: Link {$WAN.DHCP.NOME} sem IP no DHCP client
+    expression: max(/NOC - MikroTik WAN DHCP/wan.dhcp.ok,#3)=0
+    event_name: '{HOST.NAME}: link {$WAN.DHCP.NOME} sem IP (DHCP client sem lease) - sem redundância de link'
+    priority: HIGH
+    description: 'A RB não tem IP da faixa {$WAN.DHCP.PREFIX} há 3 coletas. O link de reserva não está conectado: verifique o roteador/ONT da operadora, o cabo e a porta, e o DHCP client na RB (/ip dhcp-client print).'
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: c6bd016d65674d508ce51af2c623b576
+    expression: last(/NOC - pfSense OpenVPN/ovpn.cert.vencendo)>0
+    name: Certificados de usuário da VPN vencendo
+    event_name: '{HOST.NAME}: {ITEM.LASTVALUE1} certificado(s) de usuário da VPN vencem em até 15 dias'
+    priority: INFO
+    description: 'Renove antes de vencer: com o certificado vencido o usuário não conecta. Lista na tela "NOC — Acessos VPN", filtro "Vence ≤ 15 d".'
+    tags:
+    - tag: component
+      value: vpn
+    - tag: scope
+      value: notice
+  - uuid: 5ab6dbc46511465a99c062281803bba0
+    expression: last(/NOC - pfSense OpenVPN/ovpn.seg.vpn.recusados1h)>={$OVPN.FALHAS.1H} or last(/NOC - pfSense OpenVPN/ovpn.seg.vpn.falhas1h)>={$OVPN.FALHAS.1H}
+    name: Muitas falhas de login na VPN
+    priority: WARNING
+    event_name: '{HOST.NAME}: {ITEM.LASTVALUE1} usuário(s) recusado(s) e {ITEM.LASTVALUE2} falha(s) de autenticação na VPN na última hora'
+    description: 'Provável força bruta. Veja na tela "NOC — Acessos VPN" o card "Tentativas" (servidor, IPs de origem e usuários tentados). Servidores só com senha (RA-PARCEIROS, NOTLS) são o alvo mais provável. Runbook: "Muitas falhas de login na VPN".'
+    manual_close: 'YES'
+    tags:
+    - tag: component
+      value: vpn
+    - tag: component
+      value: security
+    - tag: scope
+      value: security
+  - uuid: 12590cd68ccc4f6bbbde85eda6217b16
+    expression: last(/NOC - pfSense OpenVPN/ovpn.seg.gui.falhas1h)>={$GUI.FALHAS.1H}
+    name: Falhas de login no webGUI do pfSense
+    priority: WARNING
+    event_name: '{HOST.NAME}: {ITEM.LASTVALUE1} falha(s) de login no webGUI na última hora'
+    description: A porta 4443 só aceita IPs confiáveis. Falha aqui = alguém da equipe errando a senha, ou a regra flutuante da 4443 deixou de valer. Confira o IP de origem no card "Tentativas".
+    manual_close: 'YES'
+    tags:
+    - tag: component
+      value: vpn
+    - tag: component
+      value: security
+    - tag: scope
+      value: security
+  - uuid: 5f40aa282dd443f696a2d032652f50ee
+    expression: last(/NOC - pfSense OpenVPN/ovpn.seg.ssh.falhas1h)>={$SSH.FALHAS.1H}
+    name: Falhas de login no SSH do pfSense
+    priority: HIGH
+    event_name: '{HOST.NAME}: {ITEM.LASTVALUE1} falha(s) de login no SSH na última hora'
+    description: O SSH só é alcançável de dentro da VPN. Falhas repetidas = alguém já dentro da VPN tentando entrar no firewall. Identifique o IP (endereço da VPN) no card "Tentativas" e quem está com ele em "Conectados agora".
+    manual_close: 'YES'
+    tags:
+    - tag: component
+      value: vpn
+    - tag: component
+      value: security
+    - tag: scope
+      value: security
+  - uuid: ba66231849134dddb08a0bad5de579c2
+    expression: change(/NOC - pfSense OpenVPN/ovpn.seg.cfg.ts)<>0 and length(last(/NOC - pfSense OpenVPN/ovpn.seg.cfg.desc))>=0
+    name: Configuração do pfSense alterada
+    priority: INFO
+    event_name: '{HOST.NAME}: configuração alterada — {ITEM.LASTVALUE2}'
+    description: 'Aviso a cada mudança salva (quem, de qual IP, o quê). Fecha sozinho na coleta seguinte. Mudança que ninguém da equipe reconhece = incidente: runbook "Configuração do pfSense alterada".'
+    tags:
+    - tag: component
+      value: vpn
+    - tag: component
+      value: security
+    - tag: scope
+      value: notice
+  - uuid: 38fa6c6d14da46179735d113aca7df34
+    expression: min(/NOC - Website HTTPS/web.test.fail[Disponibilidade HTTPS],#2)>0
+    name: 'Site indisponível: {$CERT.WEBSITE.HOSTNAME}'
+    priority: HIGH
+    description: Duas execuções seguidas do scenario "Disponibilidade HTTPS" falharam. Veja o item "Last error message".
+    tags:
+    - tag: class
+      value: software
+    - tag: target
+      value: website
+  - uuid: 8248c083a4ec4f21b97b257f1c06988c
+    expression: nodata(/NOC - Website HTTPS/cert.not_after,8h)=1
+    name: 'Certificado: sem coleta há 8 h ({$CERT.WEBSITE.HOSTNAME})'
+    priority: WARNING
+    description: 'Heartbeat do Cert: Get é 6h; 8h = heartbeat + folga de 1 coleta falha.'
+    tags:
+    - tag: class
+      value: software
+    - tag: target
+      value: certificate
+  - description: 3 coletas seguidas sem resposta, com o gateway do site respondendo (túnel ok). Verifique energia, cabo e a porta do switch/PoE.
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    expression: max(/NOC - Dispositivo (ping)/icmpping[,3],#3)=0 and last(/NOC - Câmera/icmpping[{$SITE.GW},3])=1
+    name: Sem resposta ao ping
+    priority: WARNING
+    tags:
+    - tag: scope
+      value: availability
+    uuid: 3b792c06800d408cac06f17a8b9fea06
+  - dependencies:
+    - expression: max(/NOC - Dispositivo (ping)/icmpping[,3],#3)=0 and last(/NOC - Câmera/icmpping[{$SITE.GW},3])=1
+      name: Sem resposta ao ping
+    event_name: '{HOST.NAME}: perda acima de {$ICMP.LOSS.WARN}%'
+    expression: min(/NOC - Dispositivo (ping)/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC - Dispositivo (ping)/icmppingloss[,3],5m)<100 and last(/NOC - Dispositivo (ping)/icmpping[{$SITE.GW},3])=1
+    name: Perda de pacotes alta
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    tags:
+    - tag: scope
+      value: performance
+    uuid: 31a82f65899c42a88744466af5035bf9

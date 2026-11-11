@@ -1,0 +1,995 @@
+{
+  "title": "(gerado pelo noc.py)",
+  "uid": "modelo-nuvem-detalhe",
+  "tags": [
+    "zabbix",
+    "infra-nuvem"
+  ],
+  "editable": true,
+  "graphTooltip": 1,
+  "refresh": "1m",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "description": "",
+  "links": [],
+  "templating": {
+    "list": [
+      {
+        "name": "host",
+        "label": "Servidor",
+        "type": "query",
+        "datasource": {
+          "type": "alexanderzobnin-zabbix-datasource",
+          "uid": "${DS_ZABBIX}"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "refresh": 1,
+        "sort": 1,
+        "regex": "",
+        "options": [],
+        "query": {
+          "queryType": "host",
+          "group": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/",
+          "host": "/.*/",
+          "application": "",
+          "itemTag": "",
+          "item": ""
+        },
+        "definition": "Zabbix hosts: grupo /Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 900,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "timeFrom": "10m",
+      "hideTimeOverride": true,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "item": {
+            "filter": "/^Túnel até a RB: disponível$|^WAN .*: internet$|^ICMP: disponível$/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "5",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "trigger": {
+            "filter": ""
+          },
+          "tags": {
+            "filter": ""
+          },
+          "proxy": {
+            "filter": ""
+          },
+          "showProblems": "problems",
+          "functions": [],
+          "options": {
+            "acknowledged": 2,
+            "minSeverity": 0,
+            "sortProblems": "default",
+            "hostsInMaintenance": true,
+            "useTimeRange": false,
+            "limit": 500,
+            "hostProxy": false
+          }
+        }
+      ],
+      "options": {
+        "renderMode": "data",
+        "content": "<div class=\"noc\"></div>",
+        "defaultContent": "<div class=\"noc\"></div>",
+        "afterRender": "",
+        "styles": "",
+        "helpers": "",
+        "editors": [
+          "afterRender",
+          "styles"
+        ],
+        "wrap": false,
+        "contentPartials": [],
+        "editor": {
+          "format": "auto",
+          "language": "html"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "timeFrom": "1h",
+      "hideTimeOverride": true,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/Zabbix agent availability|SNMP agent availability|ICMP: disponível/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/.*CPU utilization/"
+          },
+          "itemTag": {
+            "filter": "component: cpu"
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/.*Memory utilization/"
+          },
+          "itemTag": {
+            "filter": "component: memory"
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/.*Space utilization.*|.*Used space in %.*|.*Space: Used, in %.*/"
+          },
+          "itemTag": {
+            "filter": "component: storage"
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/.*[Uu]ptime/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "G",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/Bits received|Bits sent|Number of cores|Number of CPUs|Total memory|Used memory|Available memory$|swap space in %|Number of processes$|CPU queue length|Load average \\(1m avg\\)|Operational status|States table|Source tracking table current|Firewall rules count|Packet filter running status|^WAN .*: internet$/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "5",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/.*/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "trigger": {
+            "filter": ""
+          },
+          "tags": {
+            "filter": ""
+          },
+          "proxy": {
+            "filter": ""
+          },
+          "showProblems": "problems",
+          "functions": [],
+          "options": {
+            "acknowledged": 2,
+            "minSeverity": 0,
+            "sortProblems": "default",
+            "hostsInMaintenance": true,
+            "useTimeRange": false,
+            "limit": 200,
+            "hostProxy": false
+          }
+        },
+        {
+          "refId": "Z",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "item": {
+            "filter": "/Zabbix agent availability|SNMP agent availability|ICMP: disponível/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "Y",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "5",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "trigger": {
+            "filter": ""
+          },
+          "tags": {
+            "filter": ""
+          },
+          "proxy": {
+            "filter": ""
+          },
+          "showProblems": "problems",
+          "functions": [],
+          "options": {
+            "acknowledged": 2,
+            "minSeverity": 0,
+            "sortProblems": "default",
+            "hostsInMaintenance": true,
+            "useTimeRange": false,
+            "limit": 200,
+            "hostProxy": false
+          }
+        }
+      ],
+      "options": {
+        "renderMode": "data",
+        "content": "<div class=\"noc\"></div>",
+        "defaultContent": "<div class=\"noc\"></div>",
+        "afterRender": "",
+        "styles": "",
+        "helpers": "",
+        "editors": [
+          "afterRender",
+          "styles"
+        ],
+        "wrap": false,
+        "contentPartials": [],
+        "editor": {
+          "format": "auto",
+          "language": "html"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "CPU",
+      "description": "",
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 15
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/CPU utilization/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 12,
+            "showPoints": "never",
+            "spanNulls": 600000,
+            "gradientMode": "opacity",
+            "thresholdsStyle": {
+              "mode": "line+area"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#f5b301",
+                "value": 80
+              },
+              {
+                "color": "#ef4444",
+                "value": 90
+              }
+            ]
+          },
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "lastNotNull",
+            "mean",
+            "max"
+          ],
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Memória",
+      "description": "",
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 15
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/Memory utilization/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 12,
+            "showPoints": "never",
+            "spanNulls": 600000,
+            "gradientMode": "opacity",
+            "thresholdsStyle": {
+              "mode": "line+area"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#f5b301",
+                "value": 80
+              },
+              {
+                "color": "#ef4444",
+                "value": 90
+              }
+            ]
+          },
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "lastNotNull",
+            "mean",
+            "max"
+          ],
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Espaço em disco (% usado)",
+      "description": "",
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/Space utilization|Used space in %|Space: Used, in %/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 12,
+            "showPoints": "never",
+            "spanNulls": 600000,
+            "gradientMode": "opacity",
+            "thresholdsStyle": {
+              "mode": "line+area"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#f5b301",
+                "value": 80
+              },
+              {
+                "color": "#ef4444",
+                "value": 90
+              }
+            ]
+          },
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "lastNotNull",
+            "mean",
+            "max"
+          ],
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Disco — leituras e escritas",
+      "description": "",
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/Disk read rate|Disk write rate/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 12,
+            "showPoints": "never",
+            "spanNulls": 600000,
+            "gradientMode": "opacity"
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/write/i"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "lastNotNull",
+            "mean",
+            "max"
+          ],
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Rede — tráfego por interface",
+      "description": "",
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/Linux servers|Windows Server|Zabbix servers|Rede\\/(Roteadores|Firewall|Switches)/"
+          },
+          "host": {
+            "filter": "/^$host$/"
+          },
+          "item": {
+            "filter": "/Bits received|Bits sent/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 12,
+            "showPoints": "never",
+            "spanNulls": 600000,
+            "gradientMode": "opacity"
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/sent/i"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "lastNotNull",
+            "mean",
+            "max"
+          ],
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    }
+  ]
+}

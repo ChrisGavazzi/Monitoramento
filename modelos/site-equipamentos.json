@@ -1,0 +1,265 @@
+{
+  "title": "(gerado pelo noc.py)",
+  "uid": "modelo-site-equipamentos",
+  "tags": [
+    "zabbix",
+    "infra-nuvem"
+  ],
+  "editable": true,
+  "graphTooltip": 0,
+  "refresh": "1m",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "links": [
+    {
+      "type": "dashboards",
+      "tags": [
+        "infra-nuvem"
+      ],
+      "asDropdown": false,
+      "includeVars": false,
+      "keepTime": false,
+      "title": "Infra",
+      "icon": "external link",
+      "targetBlank": false
+    }
+  ],
+  "description": "",
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 40,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "timeFrom": "10m",
+      "hideTimeOverride": true,
+      "targets": [
+        {
+          "refId": "S1",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "item": {
+            "filter": "/ICMP: disponível|ICMP: perda de pacotes|Serviço TCP .*: disponível/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "S2",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "item": {
+            "filter": "/ICMP: disponível|ICMP: perda de pacotes|Serviço TCP .*: disponível/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "S3",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "item": {
+            "filter": "/ICMP: disponível|ICMP: perda de pacotes|Serviço TCP .*: disponível/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "S4",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "item": {
+            "filter": "/ICMP: disponível|ICMP: perda de pacotes|Serviço TCP .*: disponível/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "S5",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "item": {
+            "filter": "/ICMP: disponível|ICMP: perda de pacotes|Serviço TCP .*: disponível/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "5",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "trigger": {
+            "filter": ""
+          },
+          "tags": {
+            "filter": ""
+          },
+          "proxy": {
+            "filter": ""
+          },
+          "showProblems": "problems",
+          "functions": [],
+          "options": {
+            "acknowledged": 2,
+            "minSeverity": 0,
+            "sortProblems": "default",
+            "hostsInMaintenance": true,
+            "useTimeRange": false,
+            "limit": 500,
+            "hostProxy": false
+          }
+        }
+      ],
+      "options": {
+        "renderMode": "data",
+        "content": "<div class=\"noc\"></div>",
+        "defaultContent": "<div class=\"noc\"></div>",
+        "afterRender": "",
+        "styles": "",
+        "helpers": "",
+        "editors": [
+          "afterRender",
+          "styles"
+        ],
+        "wrap": false,
+        "contentPartials": [],
+        "editor": {
+          "format": "auto",
+          "language": "html"
+        }
+      }
+    }
+  ]
+}

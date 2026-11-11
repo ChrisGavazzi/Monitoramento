@@ -1,0 +1,89 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+  - uuid: 9caa1c76621f4ca78d94e6f0e3a62492
+    name: Templates/NOC Evento
+  templates:
+  - uuid: 9549817a10c444cd97df207eb4e49bc5
+    template: NOC Evento - Switch Ruckus
+    name: NOC Evento - Switch Ruckus
+    groups:
+    - name: Templates/NOC Evento
+    description: 'Switches Ruckus ICX (FastIron). Aninha "Network Generic Device by SNMP" (interfaces, uptime). Aqui: ping e tags.'
+    templates:
+    - name: Network Generic Device by SNMP
+    items:
+    - uuid: d24394c6446c489e979a9dd5feb6b3ac
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      tags:
+      - tag: component
+        value: network
+    - uuid: 88ab7f5fb7844f0b9a4765434d1a995c
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 1fdd8160448e4b2daa90da8e6dd07731
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: switch
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+    valuemaps:
+    - uuid: acbcf4fe315b4c7aac8607682aef4bc0
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  triggers:
+  - uuid: f8342c673cf94f169c64ac10fdf088db
+    expression: max(/NOC Evento - Switch Ruckus/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    description: '3 coletas seguidas sem ping. Switch fora: tudo ligado nele cai junto.'
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 374ebe2b27664c42a4aa35ea74dbe361
+    expression: min(/NOC Evento - Switch Ruckus/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Switch Ruckus/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Switch Ruckus/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance

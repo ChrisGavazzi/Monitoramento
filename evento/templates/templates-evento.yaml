@@ -1,0 +1,1998 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+  - uuid: 9caa1c76621f4ca78d94e6f0e3a62492
+    name: Templates/NOC Evento
+  templates:
+  - uuid: 1023ffccc8bc4a12a106edadaf72ef51
+    template: NOC Evento - Camera IP
+    name: NOC Evento - Camera IP
+    description: 'Câmeras IP Intelbras (CAM*, F*, S*, LPR). Só ping: câmera não expõe saúde útil por SNMP.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: aa5b7fa69de743128580cddbcf330a0e
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: f8cd564a826c4d848ba03cafde9591a9
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 859111e04716427caf251344594af0fd
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: cftv
+    - tag: tipo
+      value: camera
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    valuemaps:
+    - uuid: f9eb3e7334144c37b99ce00d6e102818
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 4222018930be4038b26a060adf647209
+    template: NOC Evento - NVR-DVR Intelbras
+    name: NOC Evento - NVR-DVR Intelbras
+    description: Gravadores Intelbras. Ping + porta 37777 (serviço Intelbras usado pelo SIM Next/app).
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 557161e1f9c5455c8e09db96ecf13b03
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 6e6c2b93c0934451b3fec14321792167
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 1f4931d2003f44e39a4f24eb1240f626
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    - uuid: ee998a11ade54283864693a8d72dd51e
+      name: 'Serviço TCP {$SVC.PORT}: disponível'
+      type: SIMPLE
+      key: net.tcp.service[tcp,,{$SVC.PORT}]
+      delay: '{$SVC.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC Serviço
+      description: Testa se a porta {$SVC.PORT} aceita conexão. O equipamento pode responder ao ping com o serviço travado; este item pega esse caso.
+      tags:
+      - tag: component
+        value: application
+    tags:
+    - tag: area
+      value: cftv
+    - tag: tipo
+      value: nvr-dvr
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    - macro: '{$SVC.PORT}'
+      value: '37777'
+      description: Porta TCP do serviço principal do equipamento.
+    - macro: '{$SVC.INTERVAL}'
+      value: 1m
+      description: Intervalo do teste de porta.
+    valuemaps:
+    - uuid: 60760430b7a1408695e904eb29e0b48d
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+    - uuid: 6463aee454f7494a9ce0fb6068a3370e
+      name: NOC Serviço
+      mappings:
+      - value: '0'
+        newvalue: Fechada
+      - value: '1'
+        newvalue: Aberta
+  - uuid: 45e4dfdb0f354a428d4d080a1ec0a307
+    template: NOC Evento - Facial Intelbras
+    name: NOC Evento - Facial Intelbras
+    description: 'Controladores de acesso facial Intelbras. Ping + porta HTTP (API/Web). As catracas não têm inteligência própria: são acionadas pelo facial. Facial fora = catraca daquele acesso parada.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 5b892cc8651240d79b3e961703b035b8
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: d28797629c654e0e893d411a97c604ba
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: f6d29a4e115845599916bc0fdd97e2de
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    - uuid: e4229829d2884d8f80697f43f50fc423
+      name: 'Serviço TCP {$SVC.PORT}: disponível'
+      type: SIMPLE
+      key: net.tcp.service[tcp,,{$SVC.PORT}]
+      delay: '{$SVC.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC Serviço
+      description: Testa se a porta {$SVC.PORT} aceita conexão. O equipamento pode responder ao ping com o serviço travado; este item pega esse caso.
+      tags:
+      - tag: component
+        value: application
+    tags:
+    - tag: area
+      value: acesso
+    - tag: tipo
+      value: facial
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    - macro: '{$SVC.PORT}'
+      value: '80'
+      description: Porta TCP do serviço principal do equipamento.
+    - macro: '{$SVC.INTERVAL}'
+      value: 1m
+      description: Intervalo do teste de porta.
+    valuemaps:
+    - uuid: 53366d3c08714b0fa1e9996b7cdf9c25
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+    - uuid: 5dd5f0a4fe7e4dd5aa29a5b251007b3b
+      name: NOC Serviço
+      mappings:
+      - value: '0'
+        newvalue: Fechada
+      - value: '1'
+        newvalue: Aberta
+  - uuid: 6030141785c34c17a70d409978bfae30
+    template: NOC Evento - AP Ruckus
+    name: NOC Evento - AP Ruckus
+    description: 'APs Ruckus (gerência pela Ruckus One). Ping local: pega AP sem energia/PoE ou porta de switch caída.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: f62bf9509dcc4198a8f95aa30bf312d3
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 7d981f91294f4e65b6ab83210ef15907
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 3b0b23fb35624ed98d8d03e115399668
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: wifi
+    - tag: tipo
+      value: ap
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    valuemaps:
+    - uuid: 720ebae779124fe692ced4c4e953a0bc
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: cb6f7df0642a4d0d8a48a3755ceac8d2
+    template: NOC Evento - Switch Cisco
+    name: NOC Evento - Switch Cisco
+    description: 'Switch Cisco. Aninha o oficial "Cisco IOS by SNMP" (interfaces, CPU, memória). Aqui: ping e tags.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: a7f6d8261ab74a6f912f2211ce74829a
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 53327c2dea2841138446fceed8d5f8de
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 557cbcf8d12840e5a61889c0cdb0a49b
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: switch
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    templates:
+    - name: Cisco IOS by SNMP
+    valuemaps:
+    - uuid: b70263ea635f4c3eae4d4ab37bc9765d
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 34e37c24e850464088558038677709e9
+    template: NOC Evento - Switch Huawei
+    name: NOC Evento - Switch Huawei
+    description: 'Switch Huawei. Aninha o oficial "Huawei VRP by SNMP". Aqui: ping e tags.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 9027f9f44b704d9eb3b9d164f0d9c6cd
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 0ca135f8c27a4a6fbf634a3e75450fa2
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: aeac02410be949c3a82c0d65d5fb58d3
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: switch
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    templates:
+    - name: Huawei VRP by SNMP
+    valuemaps:
+    - uuid: 07d346a52ac14567becf9d4324e641b0
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 80f5e50952f94d318ee6877da6ce1bec
+    template: NOC Evento - Switch Intelbras
+    name: NOC Evento - Switch Intelbras
+    description: 'Switch Intelbras. Aninha o oficial "Network Generic Device by SNMP" (sem MIB própria da Intelbras). Aqui: ping e tags.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 0c3b1e53904b434da621521a422de673
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 8fabc546db284fc788ae418fbbebbd5e
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: bd9f907dd6554954a4b305e934b75b7e
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: switch
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    templates:
+    - name: Network Generic Device by SNMP
+    valuemaps:
+    - uuid: 959b0315ac5a4714885c4b0bb8161f57
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 553f7a4598ae449298a8a342f9ab78fb
+    template: NOC Evento - Roteador de Borda
+    name: NOC Evento - Roteador de Borda
+    description: Roteador de borda (MikroTik CCR). Vincular TAMBÉM, no host, o template oficial do modelo (MikroTik ... by SNMP).
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 8bd52710e0c34b138f4b31e0d4c0f4b6
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 96e1f12e4dd24e9589df980a9507995d
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 7c446189ad494968b9455ff14f470f6d
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: roteador
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    valuemaps:
+    - uuid: a5d08f20bdf043c9963305ce4de12d35
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 0af7e21b3e1a4e43a1f291752a7d68fc
+    template: NOC Evento - Firewall
+    name: NOC Evento - Firewall
+    description: Firewalls (carreta, telemetria). Só ping; métricas vêm do template do fabricante, se houver.
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: dab297f099504f398e5b85d8ad68c3ec
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: e64c1ad75dbc4f1bbc807977430bb739
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: ed9bd828fbfe477f8a2822f95c566d96
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: firewall
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    valuemaps:
+    - uuid: 729b6a1f3e2f4d1fa4be58759e7339c8
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 149d28366738474e882af4c11e3d638e
+    template: NOC Evento - Mylaps Decoder
+    name: NOC Evento - Mylaps Decoder
+    description: 'Decoders e rádios da cronometragem Mylaps. Sem eles não há cronometragem: severidade Disaster. Decoders de reserva usam este template com a tag de host alerta=nao.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: aad7ba08a3da4545a069ce490fdd9b56
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: a6b7d61212944707aa9494cc0dec0705
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: dbe517acd923433a8a259a7237196fa7
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: cronometragem
+    - tag: tipo
+      value: decoder
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    valuemaps:
+    - uuid: b848c61e0ff0424695a00395e5289b1f
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 3f9c86da8a20440b986f9b1609b1b003
+    template: NOC Evento - Mylaps Infra
+    name: NOC Evento - Mylaps Infra
+    description: 'Infra da cronometragem: BaseLink, SensorBOX, PowerManager, painéis, switches de box, servidores X2, câmeras de pista.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 1ae871eaf4724e5bb2ced96b9039cd12
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: cf83063932e44c0fa92427d407d16039
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 77ad1dfe79754403a06a177db6284838
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: cronometragem
+    - tag: tipo
+      value: infra
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    valuemaps:
+    - uuid: 51f6ef52a7cf4f27adde378094740175
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 5eb20482b14d43c5a6e3d149f947df0a
+    template: NOC Evento - Servidor Linux
+    name: NOC Evento - Servidor Linux
+    description: 'Servidor Linux. Aninha "Linux by Zabbix agent". Aqui: ping (detecta servidor desligado mesmo com o agente parado).'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 863ed3cbd9954f2a9dd7b156e0c6dc57
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: e859ee6af82e4bafa947bc6e3741dcfa
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 35f5977f6e134fdaa7fead8eb7b0f41f
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: servidores
+    - tag: tipo
+      value: linux
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    templates:
+    - name: Linux by Zabbix agent
+    valuemaps:
+    - uuid: 7cd7f3ac6c36400e849738b26354937a
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 19b10f51a85a4ef8a2a2e3d80d0ece8c
+    template: NOC Evento - Servidor Windows
+    name: NOC Evento - Servidor Windows
+    description: 'Servidor Windows. Aninha "Windows by Zabbix agent". Aqui: ping.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 261de2123ff74677b81858fe55b2e6d7
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: ba1c33e934c44c05ab7494a564804d37
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 15a7a40c796447e8ba8062698769988e
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: servidores
+    - tag: tipo
+      value: windows
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    templates:
+    - name: Windows by Zabbix agent
+    valuemaps:
+    - uuid: f53fd4574ed245cdb084e99806a3150e
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: cfd588e787764b77823310b64af0377d
+    template: NOC Evento - Hypervisor VMware
+    name: NOC Evento - Hypervisor VMware
+    description: 'Host ESXi (VMWARE-01). Só ping: se cair, todas as VMs dele caem junto. Para métricas de VM, usar o oficial "VMware" com credencial de API (fase 2).'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: a9690868c54b40a1b991c012ea2388fe
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: ed33848f2a124f268b4a09e1ea496e59
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 9c75feeb0afc48188c7f1dbdadea91c1
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: servidores
+    - tag: tipo
+      value: hypervisor
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    valuemaps:
+    - uuid: 45294edbcfc74c0aab6267b483f92987
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 201330a9af8443edb8a0b3a01cd0ad5d
+    template: NOC Evento - Race Control
+    name: NOC Evento - Race Control
+    description: Sistemas do Race Control sem agente (Griip, LiveTiming UX, Ant Media). Só ping.
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: b98faded583644ffac1eeff782cbf4e7
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 61fce9705c6147c8ba8e7d5341227e6f
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 3b3df68297224a26a9865141fe29268b
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: race-control
+    - tag: tipo
+      value: aplicacao
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    valuemaps:
+    - uuid: 01b55e8b2fa941bd83c483297877e0bd
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: fc722dfb86284836a5edcdbc161bbc5b
+    template: NOC Evento - Dispositivo ICMP
+    name: NOC Evento - Dispositivo ICMP
+    description: Equipamentos sem template específico (gateways, GPON, appliances). Só ping.
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 02920a8744ca4ea9bf6975352cdfcae1
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: af5a2bbf9c2f4f609a06185828134a17
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: a4189c223bd84988a1aef31b64ebe7e3
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: geral
+    - tag: tipo
+      value: icmp
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    valuemaps:
+    - uuid: 23392b44d0fa4eab9d24ab39d0407421
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: a541d557a4e6453fbddfd78637c45942
+    template: NOC Evento - Link WAN
+    name: NOC Evento - Link WAN
+    description: 'Gateway da operadora de cada link de internet (host LINK-<OPERADORA>, IP = gateway do link no MikroTik). Mede a última milha: se o gateway não responde, o link caiu. NÃO prova que a internet
+      da operadora está ok; para isso, rota /32 de um alvo externo saindo por este link no roteador e um segundo host ICMP para esse alvo.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: ede771034b4e461bac0ef483483b9ad2
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 7fa07e4371d6430d9b1adde9a8fe8e1f
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 9f0b067c495c4d8290743841b55797eb
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    - uuid: 4759c35126714b44b074ad7230b85e55
+      name: 'ICMP: variação da latência (jitter 5m)'
+      type: CALCULATED
+      key: link.jitter
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      units: s
+      params: stddevpop(//icmppingsec[,3,,,,avg],5m)
+      description: 'Desvio padrão da latência média ao gateway nos últimos 5 min. Aproximação de jitter: cada coleta já é a média de 3 pacotes, então picos curtos ficam suavizados.'
+      tags:
+      - tag: component
+        value: network
+    tags:
+    - tag: area
+      value: rede
+    - tag: tipo
+      value: link
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 15s
+      description: 'Links: ping a cada 15s (poucos hosts; melhora perda e jitter).'
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '5'
+      description: 'Perda (%) média em 5 min para Warning. Link de internet: 5% já derruba voz/vídeo.'
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.08'
+      description: 'Latência média (s) ao gateway em 5 min. Primeiro salto acima de 80 ms = problema na última milha (exceto satélite: ajuste no host).'
+    - macro: '{$LINK.JITTER.WARN}'
+      value: '0.03'
+      description: Jitter (s) por 10 min para Warning.
+    valuemaps:
+    - uuid: e8733b9033094b63b64710ce3145745f
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  - uuid: 7a8017ba0559480190a6936170a70a44
+    template: NOC Evento - Teltonika Equipe
+    name: NOC Evento - Teltonika Equipe
+    description: 'Modems/roteadores Teltonika das equipes (4G). SNMP v2c. Intervalos pensados para não gastar o plano de dados: sinal 1 min, GPS/Cell ID 5 min, IMSI 1 h.'
+    groups:
+    - name: Templates/NOC Evento
+    items:
+    - uuid: 42feec2dfc7f46f2b693784705fa1656
+      name: 'ICMP: disponível'
+      type: SIMPLE
+      key: icmpping[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      valuemap:
+        name: NOC ICMP
+      description: 1 = responde ao ping, 0 = sem resposta (3 pacotes).
+      tags:
+      - tag: component
+        value: network
+    - uuid: 9ab64081fcf3444cb44afa3a2f82c92b
+      name: 'ICMP: perda de pacotes'
+      type: SIMPLE
+      key: icmppingloss[,3]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: '%'
+      tags:
+      - tag: component
+        value: network
+    - uuid: 547f656fb04d4b59b42ac3e81d63b177
+      name: 'ICMP: tempo de resposta'
+      type: SIMPLE
+      key: icmppingsec[,3,,,,avg]
+      delay: '{$ICMP.INTERVAL}'
+      history: 14d
+      value_type: FLOAT
+      units: s
+      tags:
+      - tag: component
+        value: network
+    - uuid: 0e04e8d55e0745168b4f0a47bd52dc9e
+      name: 'Modem: uso de CPU'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.48690.1.8.0
+      key: teltonika.cpu
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      tags:
+      - tag: component
+        value: modem
+      units: '%'
+    - uuid: 04a1e0bd364c446ba5fff7fe98e4b8dd
+      name: 'Modem: sinal (RSSI)'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.48690.2.2.1.12.1
+      key: teltonika.signal
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      tags:
+      - tag: component
+        value: modem
+      units: dBm
+    - uuid: a4fc6ae070c64d55aa569ca3fabefb74
+      name: 'Modem: SINR'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.48690.2.2.1.19.1
+      key: teltonika.sinr
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      tags:
+      - tag: component
+        value: modem
+      units: dB
+    - uuid: 941506cc52944c4e8db6c2bfe66452e7
+      name: 'Modem: RSRP'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.48690.2.2.1.20.1
+      key: teltonika.rsrp
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      tags:
+      - tag: component
+        value: modem
+      units: dBm
+    - uuid: c8c651da468a4d41a2c7cf084761af20
+      name: 'Modem: RSRQ'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.48690.2.2.1.21.1
+      key: teltonika.rsrq
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      tags:
+      - tag: component
+        value: modem
+      units: dB
+    - uuid: 596fe89d2cb34548a5eff6521de0c6f8
+      name: 'Modem: Cell ID'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.48690.2.2.1.18.1
+      key: teltonika.cellid
+      delay: 5m
+      history: 14d
+      value_type: CHAR
+      tags:
+      - tag: component
+        value: modem
+      description: Muda quando o modem troca de antena (handover).
+      preprocessing:
+      - type: DISCARD_UNCHANGED_HEARTBEAT
+        parameters:
+        - 1h
+    - uuid: 63f3cdee20214bae9b1a219d4cb4446e
+      name: 'Modem: IMSI do chip'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.48690.2.2.1.8.1
+      key: teltonika.imsi
+      delay: 1h
+      history: 14d
+      value_type: CHAR
+      tags:
+      - tag: component
+        value: modem
+      preprocessing:
+      - type: DISCARD_UNCHANGED_HEARTBEAT
+        parameters:
+        - 1d
+    - uuid: 7c73f2037f504984baf79fe4c10767e2
+      name: 'GPS: latitude'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.48690.3.1.0
+      key: teltonika.lat
+      delay: 5m
+      history: 14d
+      value_type: FLOAT
+      tags:
+      - tag: component
+        value: modem
+    - uuid: 39d52122273844c7a23fb0d696d84856
+      name: 'GPS: longitude'
+      type: SNMP_AGENT
+      snmp_oid: .1.3.6.1.4.1.48690.3.2.0
+      key: teltonika.lon
+      delay: 5m
+      history: 14d
+      value_type: FLOAT
+      tags:
+      - tag: component
+        value: modem
+    tags:
+    - tag: area
+      value: equipes
+    - tag: tipo
+      value: teltonika
+    macros:
+    - macro: '{$ICMP.INTERVAL}'
+      value: 30s
+      description: Intervalo do ping. Não usar menos de 30s (carga e histórico).
+    - macro: '{$ICMP.LOSS.WARN}'
+      value: '20'
+      description: Perda (%) média em 5 min para alerta Warning.
+    - macro: '{$ICMP.RTT.WARN}'
+      value: '0.15'
+      description: 'Latência média (s) em 5 min para alerta Warning. Rede local: 150 ms já é anormal.'
+    - macro: '{$TEL.RSSI.MIN}'
+      value: '-100'
+      description: RSSI (dBm) abaixo do qual o sinal é considerado fraco.
+    valuemaps:
+    - uuid: a67ceabccd994a9284a7d82f14f547ce
+      name: NOC ICMP
+      mappings:
+      - value: '0'
+        newvalue: Sem resposta
+      - value: '1'
+        newvalue: OK
+  triggers:
+  - uuid: 53a8a89c741f4b4b820d64a52c5561ee
+    expression: max(/NOC Evento - Camera IP/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: AVERAGE
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: c6ae818516854fdd86b3542090606b18
+    expression: min(/NOC Evento - Camera IP/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Camera IP/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Camera IP/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: b8202cba856f44658ec5577e657bd094
+    expression: avg(/NOC Evento - Camera IP/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Camera IP/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: fc8a61d9156d4484a9f88a39f4a42ce9
+    expression: max(/NOC Evento - NVR-DVR Intelbras/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 58ff555c73b1488fb48fb6c6152cd991
+    expression: min(/NOC Evento - NVR-DVR Intelbras/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - NVR-DVR Intelbras/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - NVR-DVR Intelbras/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 0dc28efe74394a0d88a2f349f042dcc6
+    expression: avg(/NOC Evento - NVR-DVR Intelbras/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - NVR-DVR Intelbras/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: c140c66a0e3d46aba24eec017c7470b3
+    expression: max(/NOC Evento - NVR-DVR Intelbras/net.tcp.service[tcp,,{$SVC.PORT}],#3)=0
+    name: Serviço TCP {$SVC.PORT} não responde
+    event_name: '{HOST.NAME}: porta {$SVC.PORT} não responde (equipamento responde ao ping)'
+    priority: HIGH
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - NVR-DVR Intelbras/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 17c6e76080cf4fd79ab25818d3c977e7
+    expression: max(/NOC Evento - Facial Intelbras/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping (catraca deste acesso sem acionamento)'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: f37b3d8585da4c9896d64ffb23403b55
+    expression: min(/NOC Evento - Facial Intelbras/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Facial Intelbras/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Facial Intelbras/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: c0b47149a13844b385a2a3d0effb60a2
+    expression: avg(/NOC Evento - Facial Intelbras/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Facial Intelbras/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: c89e6c9f3ac24d50b311e869240540a3
+    expression: max(/NOC Evento - Facial Intelbras/net.tcp.service[tcp,,{$SVC.PORT}],#3)=0
+    name: Serviço TCP {$SVC.PORT} não responde
+    event_name: '{HOST.NAME}: porta {$SVC.PORT} não responde (equipamento responde ao ping)'
+    priority: HIGH
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Facial Intelbras/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: a5208f4d69b64f4282315b8ff4b47055
+    expression: max(/NOC Evento - AP Ruckus/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: WARNING
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 4386b0fa973441ecb488893ac1bdb55f
+    expression: min(/NOC Evento - AP Ruckus/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - AP Ruckus/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - AP Ruckus/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 457401ddb3b44d9db6c0311ec5e03269
+    expression: max(/NOC Evento - Switch Cisco/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 42dfaf14c15b4f388d6dd7776ec9fd02
+    expression: min(/NOC Evento - Switch Cisco/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Switch Cisco/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Switch Cisco/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 058e5a00f56f4984a1946502478355c5
+    expression: avg(/NOC Evento - Switch Cisco/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Switch Cisco/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 6399262eceaf4d3dae3cd7bc7c4b828f
+    expression: max(/NOC Evento - Switch Huawei/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: eaaa2c5b442945088671fe8f844353f1
+    expression: min(/NOC Evento - Switch Huawei/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Switch Huawei/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Switch Huawei/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 203045f9205e41ee9b4568e25dd2fcea
+    expression: avg(/NOC Evento - Switch Huawei/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Switch Huawei/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: a07349eea19f4aa98345bfdf8aaa72f8
+    expression: max(/NOC Evento - Switch Intelbras/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 891a29507b8f40228c753c09311ae747
+    expression: min(/NOC Evento - Switch Intelbras/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Switch Intelbras/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Switch Intelbras/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 4437aae87b5d4acbb755cc2869935930
+    expression: avg(/NOC Evento - Switch Intelbras/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Switch Intelbras/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 4e8a32c6d32e4876b71e9498abf55e67
+    expression: max(/NOC Evento - Roteador de Borda/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: DISASTER
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 11197064ad7448b9ac56382cc6f06a90
+    expression: min(/NOC Evento - Roteador de Borda/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Roteador de Borda/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Roteador de Borda/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 76f79323714542a4a7ae28f7044fb005
+    expression: avg(/NOC Evento - Roteador de Borda/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Roteador de Borda/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 2e733ebad88547b9844a018904947dd0
+    expression: max(/NOC Evento - Firewall/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 339f7eca55b647b8b906dd25134368f6
+    expression: min(/NOC Evento - Firewall/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Firewall/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Firewall/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 0100d1cbaf2348e0ae0ccae3509e7b69
+    expression: avg(/NOC Evento - Firewall/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Firewall/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: ef2759215a72490bb08d1195bc8477f6
+    expression: max(/NOC Evento - Mylaps Decoder/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: DISASTER
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 15ddea0a6e314332a09e6609e7f81a95
+    expression: min(/NOC Evento - Mylaps Decoder/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Mylaps Decoder/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Mylaps Decoder/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: f8a3ea7abae44f6d9638757a9566034a
+    expression: avg(/NOC Evento - Mylaps Decoder/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Mylaps Decoder/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: bee4e59b015a429893545d72c30affb4
+    expression: max(/NOC Evento - Mylaps Infra/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: ba01f277d50a40d49e5353d1f3d3329a
+    expression: min(/NOC Evento - Mylaps Infra/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Mylaps Infra/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Mylaps Infra/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 5e6e5d9fda414051b40d40b780fd46c9
+    expression: avg(/NOC Evento - Mylaps Infra/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Mylaps Infra/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 931ee594de034697a14f327b3a70b402
+    expression: max(/NOC Evento - Servidor Linux/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 848ff2612a54440f8e6fc9ea1d07a263
+    expression: min(/NOC Evento - Servidor Linux/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Servidor Linux/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Servidor Linux/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: c11a466e00494ff9840608701e947cd6
+    expression: avg(/NOC Evento - Servidor Linux/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Servidor Linux/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: c1bcec5ff42640c2a3f0c5bc6f6bc2f0
+    expression: max(/NOC Evento - Servidor Windows/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: e44c91173ae9412284c3ae0615845b6d
+    expression: min(/NOC Evento - Servidor Windows/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Servidor Windows/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Servidor Windows/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 9c7b2f2277d8475183151a997843ba0b
+    expression: avg(/NOC Evento - Servidor Windows/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Servidor Windows/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: ca1db9bff2f94cae8a81773ea8b02194
+    expression: max(/NOC Evento - Hypervisor VMware/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping (todas as VMs deste host afetadas)'
+    priority: DISASTER
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 9b3d5e88754145b5accf5026a2119556
+    expression: min(/NOC Evento - Hypervisor VMware/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Hypervisor VMware/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Hypervisor VMware/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 73d32fe19ffc475b9de71ff7d6024111
+    expression: avg(/NOC Evento - Hypervisor VMware/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Hypervisor VMware/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: d3431f0f563b4b238558e0df5647c696
+    expression: max(/NOC Evento - Race Control/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: ef07ef807c0647b499d6b8d87912a4a5
+    expression: min(/NOC Evento - Race Control/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Race Control/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Race Control/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 217a8e9a39914839a8ebe53db0523e4a
+    expression: avg(/NOC Evento - Race Control/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Race Control/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: dc98ca2ff67a460f8cc8290ba50b92a9
+    expression: max(/NOC Evento - Dispositivo ICMP/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: AVERAGE
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 0ef3d2d282af49978733799cd062ba6b
+    expression: min(/NOC Evento - Dispositivo ICMP/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Dispositivo ICMP/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Dispositivo ICMP/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 6f30d27740f4493f9e99d6067a42242a
+    expression: avg(/NOC Evento - Dispositivo ICMP/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Dispositivo ICMP/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: e50b47d417844c5688e218e690d1b893
+    expression: max(/NOC Evento - Link WAN/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping (link de internet fora, tráfego depende do failover)'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: b703c31226604391ab710f05891d1cf2
+    expression: min(/NOC Evento - Link WAN/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Link WAN/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Link WAN/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: f7fbe2d2e81e4280acb2fdd855f29045
+    expression: avg(/NOC Evento - Link WAN/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Link WAN/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 44c4b048408446569a7023d599b354af
+    expression: min(/NOC Evento - Link WAN/link.jitter,10m)>{$LINK.JITTER.WARN}
+    name: Jitter alto no link
+    event_name: '{HOST.NAME}: jitter acima de {$LINK.JITTER.WARN}s por 10 min'
+    opdata: 'Jitter: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Link WAN/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: cc1691b931be47f6afaac9063fddf156
+    expression: max(/NOC Evento - Teltonika Equipe/icmpping[,3],#3)=0
+    name: Sem resposta ao ping
+    event_name: '{HOST.NAME} sem resposta ao ping'
+    priority: WARNING
+    manual_close: 'NO'
+    description: 3 coletas seguidas sem resposta ao ping (~1,5 min com intervalo de 30s). Verifique energia, cabo e a porta do switch onde o equipamento está ligado.
+    tags:
+    - tag: scope
+      value: availability
+  - uuid: 14dd992baad2443f8aebdde1ff692355
+    expression: min(/NOC Evento - Teltonika Equipe/icmppingloss[,3],5m)>{$ICMP.LOSS.WARN} and min(/NOC Evento - Teltonika Equipe/icmppingloss[,3],5m)<100
+    name: Perda de pacotes alta
+    event_name: '{HOST.NAME}: perda de pacotes acima de {$ICMP.LOSS.WARN}%'
+    opdata: 'Perda: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Teltonika Equipe/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 44546fc8c2d84417a4210923cec8372a
+    expression: avg(/NOC Evento - Teltonika Equipe/icmppingsec[,3,,,,avg],5m)>{$ICMP.RTT.WARN}
+    name: Tempo de resposta alto
+    event_name: '{HOST.NAME}: latência acima de {$ICMP.RTT.WARN}s'
+    opdata: 'Latência: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Teltonika Equipe/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance
+  - uuid: 136c633afc1e4b9f9db9c92d15f5432e
+    expression: max(/NOC Evento - Teltonika Equipe/teltonika.signal,10m)<{$TEL.RSSI.MIN}
+    name: Sinal 4G fraco
+    event_name: '{HOST.NAME}: sinal 4G abaixo de {$TEL.RSSI.MIN} dBm por 10 min'
+    opdata: 'RSSI: {ITEM.LASTVALUE1}'
+    priority: WARNING
+    dependencies:
+    - name: Sem resposta ao ping
+      expression: max(/NOC Evento - Teltonika Equipe/icmpping[,3],#3)=0
+    tags:
+    - tag: scope
+      value: performance

@@ -1,0 +1,302 @@
+{
+  "title": "(gerado pelo noc.py)",
+  "uid": "modelo-site-switches",
+  "tags": [
+    "zabbix",
+    "infra-kestrel-hq"
+  ],
+  "editable": true,
+  "graphTooltip": 0,
+  "refresh": "1m",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "links": [],
+  "description": "",
+  "templating": {
+    "list": [
+      {
+        "name": "switch",
+        "label": "Switch",
+        "type": "query",
+        "datasource": {
+          "type": "alexanderzobnin-zabbix-datasource",
+          "uid": "${DS_ZABBIX}"
+        },
+        "hide": 2,
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1,
+        "sort": 1,
+        "regex": "",
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "query": {
+          "queryType": "host",
+          "group": "/.*/",
+          "host": "/.*/",
+          "application": "",
+          "itemTag": "",
+          "item": ""
+        },
+        "definition": "(o noc.py preenche)",
+        "options": []
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 900,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "timeFrom": "10m",
+      "hideTimeOverride": true,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "item": {
+            "filter": "/^Túnel até a RB: disponível$|^WAN .*: internet$|^ICMP: disponível$/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "5",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/.*/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "trigger": {
+            "filter": ""
+          },
+          "tags": {
+            "filter": ""
+          },
+          "proxy": {
+            "filter": ""
+          },
+          "showProblems": "problems",
+          "functions": [],
+          "options": {
+            "acknowledged": 2,
+            "minSeverity": 0,
+            "sortProblems": "default",
+            "hostsInMaintenance": true,
+            "useTimeRange": false,
+            "limit": 500,
+            "hostProxy": false
+          }
+        }
+      ],
+      "options": {
+        "renderMode": "data",
+        "content": "<div class=\"noc\"></div>",
+        "defaultContent": "<div class=\"noc\"></div>",
+        "afterRender": "",
+        "styles": "",
+        "helpers": "",
+        "editors": [
+          "afterRender",
+          "styles"
+        ],
+        "wrap": false,
+        "contentPartials": [],
+        "editor": {
+          "format": "auto",
+          "language": "html"
+        }
+      }
+    },
+    {
+      "id": 1,
+      "type": "marcusolsson-dynamictext-panel",
+      "title": "",
+      "transparent": true,
+      "datasource": {
+        "type": "alexanderzobnin-zabbix-datasource",
+        "uid": "${DS_ZABBIX}"
+      },
+      "gridPos": {
+        "h": 30,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "timeFrom": "15m",
+      "hideTimeOverride": true,
+      "targets": [
+        {
+          "refId": "P",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/$switch/"
+          },
+          "item": {
+            "filter": "/^Interface .*: (Operational status|Bits received|Bits sent|Speed|Inbound packets with errors|Outbound packets with errors|Duplex status)$/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "S",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "0",
+          "resultFormat": "time_series",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/$switch/"
+          },
+          "item": {
+            "filter": "/CPU utilization|Memory utilization|Temperature|Uptime|Power supply status|Fan status/"
+          },
+          "itemTag": {
+            "filter": ""
+          },
+          "application": {
+            "filter": ""
+          },
+          "functions": [],
+          "options": {
+            "disableDataAlignment": true,
+            "showDisabledItems": false,
+            "skipEmptyValues": false
+          }
+        },
+        {
+          "refId": "F",
+          "datasource": {
+            "type": "alexanderzobnin-zabbix-datasource",
+            "uid": "${DS_ZABBIX}"
+          },
+          "queryType": "5",
+          "group": {
+            "filter": "/.*/"
+          },
+          "host": {
+            "filter": "/$switch/"
+          },
+          "application": {
+            "filter": ""
+          },
+          "trigger": {
+            "filter": ""
+          },
+          "tags": {
+            "filter": ""
+          },
+          "proxy": {
+            "filter": ""
+          },
+          "showProblems": "problems",
+          "functions": [],
+          "options": {
+            "acknowledged": 2,
+            "minSeverity": 0,
+            "sortProblems": "default",
+            "hostsInMaintenance": true,
+            "useTimeRange": false,
+            "limit": 200,
+            "hostProxy": false
+          }
+        }
+      ],
+      "options": {
+        "renderMode": "data",
+        "content": "<div class=\"noc\"></div>",
+        "defaultContent": "<div class=\"noc\"></div>",
+        "afterRender": "",
+        "styles": "",
+        "helpers": "",
+        "editors": [
+          "afterRender",
+          "styles"
+        ],
+        "wrap": false,
+        "contentPartials": [],
+        "editor": {
+          "format": "auto",
+          "language": "html"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+# =====================================================================================================
+#  CONFIGURAÇÃO DO NOC
+#
+#  1. Copie este arquivo para noc.yaml
+#  2. Troque os exemplos pelos dados da sua empresa (tudo aqui é fictício)
+#  3. python noc.py gerar          -> cria a pasta saida/ com as telas do Grafana e os hosts do Zabbix
+#
+#  Regras do arquivo (YAML): a indentação é com espaços (nunca TAB), "#" começa um comentário,
+#  e um item de lista começa com "- ". Textos com ":" ou "#" vão entre aspas.
+# =====================================================================================================
+
+empresa: Kestrel                 # aparece no canto do cabeçalho das telas
+
+# Community SNMP: NUNCA escreva a community aqui. As telas e os hosts usam esta macro; crie ela no Zabbix
+# (Administration -> Macros, tipo "Secret text") com o valor real.
+snmp_macro: "{$SNMP_COMMUNITY}"
+
+# -----------------------------------------------------------------------------------------------------
+#  NUVEM / DATACENTER: onde ficam os servidores (e normalmente o próprio Zabbix).
+#  Apague o bloco inteiro se você só tem sites, sem servidores para mostrar.
+# -----------------------------------------------------------------------------------------------------
+nuvem:
+  nome: Nuvem                    # nome da aba e do bloco no mapa
+
+  # Firewall principal: os sites chegam até aqui pelos túneis.
+  firewall: { host: SRV-FW01, ip: 10.80.1.1, nome: pfSense nuvem }
+
+  # Servidores. "host" = nome EXATO do host no Zabbix. "so" = win | linux | ubuntu | bsd (só a etiqueta do cartão).
+  # Os servidores precisam estar no Zabbix com o template de agente de sempre (Linux/Windows by Zabbix agent)
+  # e num destes grupos: "Linux servers", "Windows Server" ou "Zabbix servers".
+  servidores:
+    - { host: SRV-DC01,      ip: 10.80.1.10, so: win,    desc: AD / DNS }
+    - { host: SRV-SQL01,     ip: 10.80.1.20, so: win,    desc: Banco de dados }
+    - { host: SRV-ERP01,     ip: 10.80.1.30, so: win,    desc: ERP }
+    - { host: SRV-WEB01,     ip: 10.80.1.40, so: ubuntu, desc: Sites }
+    - { host: SRV-ARQ01,     ip: 10.80.1.50, so: win,    desc: Arquivos }
+    - { host: Zabbix server, ip: 10.80.1.5,  so: linux,  desc: Zabbix }
+    - { host: SRV-APP01,     ip: 10.80.1.61, so: win }
+
+  # (opcional) Outros firewalls, separados do principal, cada um com os servidores que ficam atrás dele.
+  outros_firewalls:
+    - { host: SRV-FW02, ip: 10.80.1.2, nome: pfSense aplicações, servidores: [SRV-APP01] }
+
+  # (opcional) Hosts que ficam fora de qualquer firewall (direto na internet).
+  fora_do_firewall:
+    - { host: VPS-BORDA01, ip: 10.80.2.10, so: ubuntu, desc: VPN WireGuard }
+
+  # (opcional) Tela de acessos VPN: host do pfSense onde roda o coletor pfsense/zbx_ovpn.php.
+  # Apague a linha se não usar.
+  vpn: SRV-FW01
+
+# -----------------------------------------------------------------------------------------------------
+#  SITES: cada local com roteador e internet próprios (matriz, filial, galpão em outro endereço...).
+#  Cada site ganha as suas telas: visão geral, mapa, links, switches, quedas e equipamentos.
+#
+#  Um galpão no MESMO endereço, atrás do mesmo roteador, não é um site novo: é uma "area" do site (ver abaixo).
+# -----------------------------------------------------------------------------------------------------
+sites:
+
+  - id: matriz                   # curto, minúsculo, sem espaço nem acento: vai nos endereços das telas
+    nome: Matriz                 # como aparece nas telas e nos grupos do Zabbix ("Matriz/Switches"...)
+
+    # Gateway da rede de gerência do site. Todo equipamento do site pinga este IP junto com o próprio ping:
+    # se o gateway também não responde, o problema é o caminho até o site, não o equipamento.
+    gateway: 172.22.10.1
+
+    # Roteador de borda. "ip" = o IP que o Zabbix usa para falar SNMP com ele (pelo túnel, em geral).
+    # "mikrotik: sim" usa o template SNMP do MikroTik e gera o script de sentinelas (saida/mikrotik/).
+    # "lan" = interface onde ficam os IPs sentinela (padrão: bridge).
+    roteador: { host: RTR-MATRIZ, ip: 172.22.10.1, modelo: RB4011, mikrotik: sim, lan: bridge }
+
+    # Túnel até a nuvem (o Zabbix enxerga o site por ele). "ip" = IP do roteador DENTRO do túnel,
+    # "interface" = nome da interface do túnel no roteador. Site sem túnel (Zabbix na mesma rede): apague o bloco.
+    tunel: { ip: 10.255.8.2, interface: ovpn-nuvem }
+
+    # Links de internet. "nome" precisa ser único na empresa toda (vira "WAN <NOME>: internet" no Zabbix).
+    #   interface : interface do link no roteador (a do PPPoE, se for PPPoE)
+    #   down / up : banda contratada em Mbps (as telas mostram o uso contra ela)
+    #   sentinela : IP livre na rede de gerência; o roteador liga/desliga este IP conforme o link tem internet
+    #   sonda     : IP na internet que só é alcançado por este link (rota fixa no roteador)
+    #   ip_publico: (opcional) IP fixo do link, pingado da nuvem: mostra o link mesmo com o túnel fora
+    #   gateway   : (opcional) gateway da operadora, pingado da nuvem
+    #   dhcp_faixa: (opcional) o link recebe IP por DHCP do modem da operadora: início do IP que ele entrega
+    #              (ex.: "192.168.100."). Alerta quando o roteador fica sem IP dessa faixa. Um por roteador.
+    links:
+      - { nome: ALFA, interface: pppoe-alfa, down: 500, up: 250, sentinela: 172.22.10.250, sonda: 1.0.0.1,
+          ip_publico: 198.51.100.24, gateway: 198.51.100.1, rotulo: "fibra · PPPoE" }
+      - { nome: BETA, interface: ether2, down: 300, up: 100, sentinela: 172.22.10.251, sonda: 9.9.9.9,
+          dhcp_faixa: "192.168.100.", rotulo: "cabo · DHCP" }
+
+    # Equipamentos e como eles se ligam. É daqui que saem o mapa e as dependências de alerta.
+    #   id    : apelido curto, usado só neste arquivo (no "liga" dos outros)
+    #   tipo  : switch | ap | nvr | acesso | interfone | nas | outro
+    #   host  : nome EXATO do host no Zabbix (o "gerar" cria o host se você importar saida/zabbix/hosts.yaml)
+    #   nome  : (opcional) nome curto no mapa
+    #   liga  : onde este equipamento está ligado, "ID:PORTA". O roteador tem id "RTR".
+    #           Ex.: "RTR:ether3", "SW01:24", "AP03:wifi" (ligado sem fio, pelo AP03)
+    #   porta : (opcional) porta DESTE equipamento usada na ligação (uplink)
+    #   modelo: (opcional) aparece embaixo do nome; para "ap", "grandstream" usa o template SNMP do GWN
+    #   porta_servico: (opcional, tipo "acesso") porta TCP que o controle de acesso atende (padrão 80)
+    equipamentos:
+      - { id: SW01, tipo: switch, host: SW-MTZ-01, ip: 172.22.10.11, nome: Core,       liga: "RTR:ether3", porta: 25 }
+      - { id: SW02, tipo: switch, host: SW-MTZ-02, ip: 172.22.10.12, nome: Escritório, liga: "SW01:26",    porta: 25 }
+      - { id: SW03, tipo: switch, host: SW-MTZ-03, ip: 172.22.10.13, nome: Produção,   liga: "SW01:27",    porta: 25 }
+      - { id: SW04, tipo: switch, host: SW-MTZ-04, ip: 172.22.10.14, nome: Expedição,  liga: "SW03:28",    porta: 25 }
+      - { id: AP01, tipo: ap, host: AP-MTZ-01, ip: 172.22.30.11, nome: AP Recepção,   liga: "SW02:23", modelo: grandstream }
+      - { id: AP02, tipo: ap, host: AP-MTZ-02, ip: 172.22.30.12, nome: AP Escritório, liga: "SW02:24", modelo: grandstream }
+      - { id: AP03, tipo: ap, host: AP-MTZ-03, ip: 172.22.30.13, nome: AP Reuniões,   liga: "SW01:22", modelo: grandstream }
+      - { id: AP04, tipo: ap, host: AP-MTZ-04, ip: 172.22.30.14, nome: AP Produção,   liga: "SW03:23", modelo: grandstream }
+      - { id: AP05, tipo: ap, host: AP-MTZ-05, ip: 172.22.30.15, nome: AP Expedição,  liga: "SW04:23", modelo: grandstream }
+      - { id: NVR,  tipo: nvr, host: NVR-MTZ, ip: 172.22.20.10, nome: Gravador, liga: "SW01:14" }
+      - { id: NAS,  tipo: nas, host: NAS-MTZ, ip: 172.22.20.20, nome: Backup,   liga: "SW02:6" }
+      - { id: AC01, tipo: acesso, host: ACESSO-MTZ-PORTARIA, ip: 172.22.20.41, nome: Portaria, liga: "SW02:7" }
+      - { id: AC02, tipo: acesso, host: ACESSO-MTZ-DOCA,     ip: 172.22.20.42, nome: Doca,     liga: "SW04:8" }
+      - { id: AC03, tipo: acesso, host: ACESSO-MTZ-PATIO,    ip: 172.22.20.43, nome: Pátio,    liga: "AP05:wifi" }
+      - { id: IF01, tipo: interfone, host: INTERFONE-MTZ, ip: 172.22.20.50, nome: Interfone, liga: "SW02:8" }
+
+    # Câmeras: aparecem como contador embaixo do switch (não viram caixas no mapa) e entram nas dependências.
+    # "liga" igual aos equipamentos. Uma linha por câmera.
+    cameras:
+      - { host: CAM-MTZ-01, ip: 172.22.20.31, liga: "SW02:1" }
+      - { host: CAM-MTZ-02, ip: 172.22.20.32, liga: "SW02:2" }
+      - { host: CAM-MTZ-03, ip: 172.22.20.33, liga: "SW03:1" }
+      - { host: CAM-MTZ-04, ip: 172.22.20.34, liga: "SW03:2" }
+      - { host: CAM-MTZ-05, ip: 172.22.20.35, liga: "SW03:3" }
+      - { host: CAM-MTZ-06, ip: 172.22.20.36, liga: "SW03:4" }
+      - { host: CAM-MTZ-07, ip: 172.22.20.37, liga: "SW04:1" }
+      - { host: CAM-MTZ-08, ip: 172.22.20.38, liga: "SW04:2" }
+      - { host: CAM-MTZ-09, ip: 172.22.20.39, liga: "SW04:3" }
+      - { host: CAM-MTZ-10, ip: 172.22.20.40, liga: "SW01:2" }
+
+    # (opcional) telas: escolha quais telas este site ganha. Sem a linha = todas.
+    # telas: [visao-geral, mapa, links, switches, quedas, equipamentos]
+
+    # (opcional) Áreas: um equipamento e TUDO o que está atrás dele ganham moldura no mapa e um filtro próprio.
+    # Use para um galpão ou andar que fica atrás do MESMO roteador.
+    areas:
+      - { nome: Expedição, raiz: SW04 }
+
+  # ---------------------------------------------------------------------------------------------------
+  #  Segundo site: um galpão em OUTRO endereço, com roteador, link e túnel próprios.
+  #  Para mais sites, copie este bloco inteiro e troque os dados.
+  # ---------------------------------------------------------------------------------------------------
+  - id: galpao
+    nome: Galpão Norte
+    gateway: 172.23.10.1
+    roteador: { host: RTR-GALPAO, ip: 172.23.10.1, modelo: hEX S, mikrotik: sim }
+    tunel: { ip: 10.255.8.6, interface: ovpn-nuvem }
+    links:
+      - { nome: GAMA, interface: ether1, down: 200, up: 50, sentinela: 172.23.10.250, sonda: 1.1.1.1,
+          ip_publico: 203.0.113.77, rotulo: "fibra · IP fixo" }
+    equipamentos:
+      - { id: SW01, tipo: switch, host: SW-GLP-01, ip: 172.23.10.11, nome: Core,     liga: "RTR:ether2", porta: 24 }
+      - { id: SW02, tipo: switch, host: SW-GLP-02, ip: 172.23.10.12, nome: Estoque,  liga: "SW01:23",    porta: 24 }
+      - { id: AP01, tipo: ap, host: AP-GLP-01, ip: 172.23.30.11, nome: AP Escritório, liga: "SW01:20" }
+      - { id: AP02, tipo: ap, host: AP-GLP-02, ip: 172.23.30.12, nome: AP Estoque,    liga: "SW02:20" }
+      - { id: NVR,  tipo: nvr, host: NVR-GLP, ip: 172.23.20.10, nome: Gravador, liga: "SW01:10" }
+      - { id: AC01, tipo: acesso, host: ACESSO-GLP-PORTAO, ip: 172.23.20.41, nome: Portão, liga: "SW02:8" }
+    cameras:
+      - { host: CAM-GLP-01, ip: 172.23.20.31, liga: "SW01:1" }
+      - { host: CAM-GLP-02, ip: 172.23.20.32, liga: "SW01:2" }
+      - { host: CAM-GLP-03, ip: 172.23.20.33, liga: "SW02:1" }
+      - { host: CAM-GLP-04, ip: 172.23.20.34, liga: "SW02:2" }
+      - { host: CAM-GLP-05, ip: 172.23.20.35, liga: "SW02:3" }

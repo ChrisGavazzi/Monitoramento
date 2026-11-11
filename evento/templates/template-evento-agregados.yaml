@@ -1,0 +1,399 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+  - uuid: 9caa1c76621f4ca78d94e6f0e3a62492
+    name: Templates/NOC Evento
+  host_groups:
+  - uuid: b38ac2953e2f439fa543e7e0e444ef0b
+    name: Evento/Agregados
+  templates:
+  - uuid: afd3ee261ae04300b7d08382871d65b3
+    template: NOC Evento - Agregados
+    name: NOC Evento - Agregados
+    groups:
+    - name: Templates/NOC Evento
+    description: Indicadores agregados por categoria (aggregate calculations sobre o item de ping icmpping[,3] dos templates NOC Evento). Vincular SÓ ao host EVENTO-AGREGADOS. Câmeras individuais não vão ao Telegram (tag alerta=agregado); este template
+      avisa a falha em massa.
+    items:
+    - uuid: 48b4eff6c43f4067a10c04d8b6c6d399
+      name: 'Câmeras: total monitorado'
+      type: CALCULATED
+      key: agg.cam.total
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/CFTV/Cameras"]))
+      description: Hosts com ping ativo no grupo Evento/CFTV/Cameras.
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: cam
+    - uuid: 296c128e650b484fbc440ea70c90bbaa
+      name: 'Câmeras: fora do ar'
+      type: CALCULATED
+      key: agg.cam.down
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/CFTV/Cameras"]))-sum(last_foreach(/*/icmpping[,3]?[group="Evento/CFTV/Cameras"]))
+      description: Total menos os que respondem ao ping (ping = 1/0).
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: cam
+    - uuid: 0a45e9acb8864c81be540e2b9f903dde
+      name: 'Faciais: total monitorado'
+      type: CALCULATED
+      key: agg.fac.total
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/Acesso/Faciais"]))
+      description: Hosts com ping ativo no grupo Evento/Acesso/Faciais.
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: fac
+    - uuid: d606f076b2514354bd3abf9334038d86
+      name: 'Faciais: fora do ar'
+      type: CALCULATED
+      key: agg.fac.down
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/Acesso/Faciais"]))-sum(last_foreach(/*/icmpping[,3]?[group="Evento/Acesso/Faciais"]))
+      description: Total menos os que respondem ao ping (ping = 1/0).
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: fac
+    - uuid: 8e385781c6934b1ea524bc5be5b4b3ab
+      name: 'Infra Mylaps: total monitorado'
+      type: CALCULATED
+      key: agg.mly.total
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/Cronometragem/Infra"]))
+      description: Hosts com ping ativo no grupo Evento/Cronometragem/Infra.
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: mly
+    - uuid: 3ea56aa506e14e9b83e2425d4ab94d84
+      name: 'Infra Mylaps: fora do ar'
+      type: CALCULATED
+      key: agg.mly.down
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/Cronometragem/Infra"]))-sum(last_foreach(/*/icmpping[,3]?[group="Evento/Cronometragem/Infra"]))
+      description: Total menos os que respondem ao ping (ping = 1/0).
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: mly
+    - uuid: 51100a857ffd4394a56bcd244bd7321d
+      name: 'Decoders e rádios: total monitorado'
+      type: CALCULATED
+      key: agg.dec.total
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/Cronometragem/Decoders"]))
+      description: Hosts com ping ativo no grupo Evento/Cronometragem/Decoders.
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: dec
+    - uuid: 74ca859ce301496ca6ec73e9feef8342
+      name: 'Decoders e rádios: fora do ar'
+      type: CALCULATED
+      key: agg.dec.down
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/Cronometragem/Decoders"]))-sum(last_foreach(/*/icmpping[,3]?[group="Evento/Cronometragem/Decoders"]))
+      description: Total menos os que respondem ao ping (ping = 1/0).
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: dec
+    - uuid: f0618cc2933d4c1890356240a8c2e2e1
+      name: 'Gravadores NVR/DVR: total monitorado'
+      type: CALCULATED
+      key: agg.nvr.total
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/CFTV/NVR-DVR"]))
+      description: Hosts com ping ativo no grupo Evento/CFTV/NVR-DVR.
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: nvr
+    - uuid: 2140e1aba6aa4137aeb5ba3a3d475f47
+      name: 'Gravadores NVR/DVR: fora do ar'
+      type: CALCULATED
+      key: agg.nvr.down
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/CFTV/NVR-DVR"]))-sum(last_foreach(/*/icmpping[,3]?[group="Evento/CFTV/NVR-DVR"]))
+      description: Total menos os que respondem ao ping (ping = 1/0).
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: nvr
+    - uuid: 457b1baf541d47a68294df38c660facd
+      name: 'Modems das equipes: total monitorado'
+      type: CALCULATED
+      key: agg.eqp.total
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/Equipes"]))
+      description: Hosts com ping ativo no grupo Evento/Equipes.
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: eqp
+    - uuid: 8ef5d6e9ed194977bcf69e5c031e2934
+      name: 'Modems das equipes: fora do ar'
+      type: CALCULATED
+      key: agg.eqp.down
+      delay: 1m
+      history: 14d
+      value_type: FLOAT
+      params: count(last_foreach(/*/icmpping[,3]?[group="Evento/Equipes"]))-sum(last_foreach(/*/icmpping[,3]?[group="Evento/Equipes"]))
+      description: Total menos os que respondem ao ping (ping = 1/0).
+      tags:
+      - tag: component
+        value: agregado
+      - tag: categoria
+        value: eqp
+    macros:
+    - macro: '{$AGG.CAM.MIN}'
+      value: '5'
+      description: 'Câmeras: quantidade fora do ar que gera alerta Average.'
+    - macro: '{$AGG.CAM.PCT}'
+      value: '20'
+      description: 'Câmeras: % fora do ar que eleva para High.'
+    - macro: '{$AGG.FAC.MIN}'
+      value: '3'
+      description: 'Faciais: quantidade fora do ar que gera alerta Average.'
+    - macro: '{$AGG.FAC.PCT}'
+      value: '10'
+      description: 'Faciais: % fora do ar que eleva para High.'
+    - macro: '{$AGG.MLY.MIN}'
+      value: '2'
+      description: 'Infra Mylaps: quantidade fora do ar que gera alerta Average.'
+    - macro: '{$AGG.MLY.PCT}'
+      value: '15'
+      description: 'Infra Mylaps: % fora do ar que eleva para High.'
+    - macro: '{$AGG.DEC.MIN}'
+      value: '2'
+      description: 'Decoders e rádios: quantidade fora do ar que gera alerta Average.'
+    - macro: '{$AGG.DEC.PCT}'
+      value: '10'
+      description: 'Decoders e rádios: % fora do ar que eleva para High.'
+    - macro: '{$AGG.NVR.MIN}'
+      value: '2'
+      description: 'Gravadores NVR/DVR: quantidade fora do ar que gera alerta Average.'
+    - macro: '{$AGG.NVR.PCT}'
+      value: '20'
+      description: 'Gravadores NVR/DVR: % fora do ar que eleva para High.'
+    - macro: '{$AGG.EQP.MIN}'
+      value: '4'
+      description: 'Modems das equipes: quantidade fora do ar que gera alerta Average.'
+    - macro: '{$AGG.EQP.PCT}'
+      value: '50'
+      description: 'Modems das equipes: % fora do ar que eleva para High.'
+    tags:
+    - tag: area
+      value: agregados
+  triggers:
+  - uuid: 23798d497b3d452ba788d23e979539cc
+    expression: last(/NOC Evento - Agregados/agg.cam.down)*100>=last(/NOC Evento - Agregados/agg.cam.total)*{$AGG.CAM.PCT} and last(/NOC Evento - Agregados/agg.cam.down)>={$AGG.CAM.MIN}
+    name: 'Câmeras: {$AGG.CAM.PCT}% ou mais fora do ar'
+    event_name: 'Câmeras: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar (falha em massa: energia, switch ou link)'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 'Muitos equipamentos da mesma categoria caíram juntos. Causa provável comum: switch/PoE, energia do setor ou uplink. Ver quais no Grafana (dashboard da categoria).'
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: cam
+  - uuid: ee1cc0318f97400f956c9d2b572028de
+    expression: last(/NOC Evento - Agregados/agg.cam.down)>={$AGG.CAM.MIN} and last(/NOC Evento - Agregados/agg.cam.total)>0
+    name: 'Câmeras: {$AGG.CAM.MIN} ou mais fora do ar'
+    event_name: 'Câmeras: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar'
+    priority: AVERAGE
+    manual_close: 'NO'
+    description: Ver quais no Grafana (dashboard da categoria).
+    dependencies:
+    - name: 'Câmeras: {$AGG.CAM.PCT}% ou mais fora do ar'
+      expression: last(/NOC Evento - Agregados/agg.cam.down)*100>=last(/NOC Evento - Agregados/agg.cam.total)*{$AGG.CAM.PCT} and last(/NOC Evento - Agregados/agg.cam.down)>={$AGG.CAM.MIN}
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: cam
+  - uuid: cb6dd1f6f36b499d914e14d5df28c9ec
+    expression: last(/NOC Evento - Agregados/agg.fac.down)*100>=last(/NOC Evento - Agregados/agg.fac.total)*{$AGG.FAC.PCT} and last(/NOC Evento - Agregados/agg.fac.down)>={$AGG.FAC.MIN}
+    name: 'Faciais: {$AGG.FAC.PCT}% ou mais fora do ar'
+    event_name: 'Faciais: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar (falha em massa: energia, switch ou link)'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 'Muitos equipamentos da mesma categoria caíram juntos. Causa provável comum: switch/PoE, energia do setor ou uplink. Ver quais no Grafana (dashboard da categoria).'
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: fac
+  - uuid: 3fe71fe158a04515866e2f261ebc32ca
+    expression: last(/NOC Evento - Agregados/agg.fac.down)>={$AGG.FAC.MIN} and last(/NOC Evento - Agregados/agg.fac.total)>0
+    name: 'Faciais: {$AGG.FAC.MIN} ou mais fora do ar'
+    event_name: 'Faciais: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar'
+    priority: AVERAGE
+    manual_close: 'NO'
+    description: Ver quais no Grafana (dashboard da categoria).
+    dependencies:
+    - name: 'Faciais: {$AGG.FAC.PCT}% ou mais fora do ar'
+      expression: last(/NOC Evento - Agregados/agg.fac.down)*100>=last(/NOC Evento - Agregados/agg.fac.total)*{$AGG.FAC.PCT} and last(/NOC Evento - Agregados/agg.fac.down)>={$AGG.FAC.MIN}
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: fac
+  - uuid: 1bf39888d43c4b87829f3bd11467b7d6
+    expression: last(/NOC Evento - Agregados/agg.mly.down)*100>=last(/NOC Evento - Agregados/agg.mly.total)*{$AGG.MLY.PCT} and last(/NOC Evento - Agregados/agg.mly.down)>={$AGG.MLY.MIN}
+    name: 'Infra Mylaps: {$AGG.MLY.PCT}% ou mais fora do ar'
+    event_name: 'Infra Mylaps: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar (falha em massa: energia, switch ou link)'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 'Muitos equipamentos da mesma categoria caíram juntos. Causa provável comum: switch/PoE, energia do setor ou uplink. Ver quais no Grafana (dashboard da categoria).'
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: mly
+  - uuid: 9ba8a617a11d4c5fb1c829868f3cc580
+    expression: last(/NOC Evento - Agregados/agg.mly.down)>={$AGG.MLY.MIN} and last(/NOC Evento - Agregados/agg.mly.total)>0
+    name: 'Infra Mylaps: {$AGG.MLY.MIN} ou mais fora do ar'
+    event_name: 'Infra Mylaps: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar'
+    priority: AVERAGE
+    manual_close: 'NO'
+    description: Ver quais no Grafana (dashboard da categoria).
+    dependencies:
+    - name: 'Infra Mylaps: {$AGG.MLY.PCT}% ou mais fora do ar'
+      expression: last(/NOC Evento - Agregados/agg.mly.down)*100>=last(/NOC Evento - Agregados/agg.mly.total)*{$AGG.MLY.PCT} and last(/NOC Evento - Agregados/agg.mly.down)>={$AGG.MLY.MIN}
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: mly
+  - uuid: 59b0d3675c124cdd81b9fcc33d2a985f
+    expression: last(/NOC Evento - Agregados/agg.dec.down)*100>=last(/NOC Evento - Agregados/agg.dec.total)*{$AGG.DEC.PCT} and last(/NOC Evento - Agregados/agg.dec.down)>={$AGG.DEC.MIN}
+    name: 'Decoders e rádios: {$AGG.DEC.PCT}% ou mais fora do ar'
+    event_name: 'Decoders e rádios: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar (falha em massa: energia, switch ou link)'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 'Muitos equipamentos da mesma categoria caíram juntos. Causa provável comum: switch/PoE, energia do setor ou uplink. Ver quais no Grafana (dashboard da categoria).'
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: dec
+  - uuid: d9777839e5b846b3a897efb22c11c84a
+    expression: last(/NOC Evento - Agregados/agg.dec.down)>={$AGG.DEC.MIN} and last(/NOC Evento - Agregados/agg.dec.total)>0
+    name: 'Decoders e rádios: {$AGG.DEC.MIN} ou mais fora do ar'
+    event_name: 'Decoders e rádios: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar'
+    priority: AVERAGE
+    manual_close: 'NO'
+    description: Ver quais no Grafana (dashboard da categoria).
+    dependencies:
+    - name: 'Decoders e rádios: {$AGG.DEC.PCT}% ou mais fora do ar'
+      expression: last(/NOC Evento - Agregados/agg.dec.down)*100>=last(/NOC Evento - Agregados/agg.dec.total)*{$AGG.DEC.PCT} and last(/NOC Evento - Agregados/agg.dec.down)>={$AGG.DEC.MIN}
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: dec
+  - uuid: 1a39f9b8a21f4b62b7b2f72a7d851df9
+    expression: last(/NOC Evento - Agregados/agg.nvr.down)*100>=last(/NOC Evento - Agregados/agg.nvr.total)*{$AGG.NVR.PCT} and last(/NOC Evento - Agregados/agg.nvr.down)>={$AGG.NVR.MIN}
+    name: 'Gravadores NVR/DVR: {$AGG.NVR.PCT}% ou mais fora do ar'
+    event_name: 'Gravadores NVR/DVR: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar (falha em massa: energia, switch ou link)'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 'Muitos equipamentos da mesma categoria caíram juntos. Causa provável comum: switch/PoE, energia do setor ou uplink. Ver quais no Grafana (dashboard da categoria).'
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: nvr
+  - uuid: ef7294842621451c823600f216e4e836
+    expression: last(/NOC Evento - Agregados/agg.nvr.down)>={$AGG.NVR.MIN} and last(/NOC Evento - Agregados/agg.nvr.total)>0
+    name: 'Gravadores NVR/DVR: {$AGG.NVR.MIN} ou mais fora do ar'
+    event_name: 'Gravadores NVR/DVR: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar'
+    priority: AVERAGE
+    manual_close: 'NO'
+    description: Ver quais no Grafana (dashboard da categoria).
+    dependencies:
+    - name: 'Gravadores NVR/DVR: {$AGG.NVR.PCT}% ou mais fora do ar'
+      expression: last(/NOC Evento - Agregados/agg.nvr.down)*100>=last(/NOC Evento - Agregados/agg.nvr.total)*{$AGG.NVR.PCT} and last(/NOC Evento - Agregados/agg.nvr.down)>={$AGG.NVR.MIN}
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: nvr
+  - uuid: 53d138918666469f97273526c54adc53
+    expression: last(/NOC Evento - Agregados/agg.eqp.down)*100>=last(/NOC Evento - Agregados/agg.eqp.total)*{$AGG.EQP.PCT} and last(/NOC Evento - Agregados/agg.eqp.down)>={$AGG.EQP.MIN}
+    name: 'Modems das equipes: {$AGG.EQP.PCT}% ou mais fora do ar'
+    event_name: 'Modems das equipes: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar (falha em massa: energia, switch ou link)'
+    priority: HIGH
+    manual_close: 'NO'
+    description: 'Muitos equipamentos da mesma categoria caíram juntos. Causa provável comum: switch/PoE, energia do setor ou uplink. Ver quais no Grafana (dashboard da categoria).'
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: eqp
+  - uuid: 08179a17c762461194df44aa88ff35b5
+    expression: last(/NOC Evento - Agregados/agg.eqp.down)>={$AGG.EQP.MIN} and last(/NOC Evento - Agregados/agg.eqp.total)>0
+    name: 'Modems das equipes: {$AGG.EQP.MIN} ou mais fora do ar'
+    event_name: 'Modems das equipes: {ITEM.LASTVALUE1} de {ITEM.LASTVALUE2} fora do ar'
+    priority: AVERAGE
+    manual_close: 'NO'
+    description: Ver quais no Grafana (dashboard da categoria).
+    dependencies:
+    - name: 'Modems das equipes: {$AGG.EQP.PCT}% ou mais fora do ar'
+      expression: last(/NOC Evento - Agregados/agg.eqp.down)*100>=last(/NOC Evento - Agregados/agg.eqp.total)*{$AGG.EQP.PCT} and last(/NOC Evento - Agregados/agg.eqp.down)>={$AGG.EQP.MIN}
+    tags:
+    - tag: scope
+      value: availability
+    - tag: categoria
+      value: eqp
+  hosts:
+  - host: EVENTO-AGREGADOS
+    name: EVENTO-AGREGADOS
+    templates:
+    - name: NOC Evento - Agregados
+    groups:
+    - name: Evento/Agregados
+    tags:
+    - tag: alerta
+      value: sim
+    description: 'Host virtual (sem interface): só itens calculados de agregação.'
